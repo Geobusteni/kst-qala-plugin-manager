@@ -1,0 +1,100 @@
+{
+  "name": "qala/qala-plugin-manager",
+  "description": "A Qala MU Plugin for plugin management",
+  "type": "wordpress-muplugin",
+  "keywords": [
+    "WordPress",
+    "Qala"
+  ],
+  "authors": [
+    {
+      "name": "Angry Creative AB",
+      "email": "hej@angrycreative.se",
+      "homepage": "https://angrycreative.com"
+    },
+    {
+      "name": "Jonathan de Jong",
+      "email": "jonathan.dejong@angrycreative.se",
+      "homepage": "https://angrycreative.com"
+    }
+  ],
+  "homepage": "https://angrycreative.com",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "require": {
+    "php": ">=7.3"
+  },
+  "require-dev": {
+    "squizlabs/php_codesniffer": "*",
+    "wp-coding-standards/wpcs": "2.*",
+    "automattic/vipwpcs": "^2.3",
+    "dealerdirect/phpcodesniffer-composer-installer": "*",
+    "phpro/grumphp": "1.5.*",
+    "phpstan/phpstan": "*",
+    "szepeviktor/phpstan-wordpress": "^1.1",
+    "phpcompatibility/php-compatibility": "*",
+    "php-stubs/woocommerce-stubs": "*",
+    "pronamic/wp-documentor": "*",
+    "phpstan/extension-installer": "^1.4",
+    "phpunit/phpunit": "^9.6",
+    "brain/monkey": "^2.6",
+    "mockery/mockery": "^1.5"
+  },
+  "config": {
+    "vendor-dir": "dependencies/vendor",
+    "allow-plugins": {
+      "composer/installers": true,
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "phpro/grumphp": true,
+      "phpstan/extension-installer": true
+    }
+  },
+  "extra": {
+    "grumphp": {
+      "config-default-path": "dependencies/grumphp/grumphp.yml",
+      "project-path": "./"
+    }
+  },
+  "autoload": {
+    "psr-4": {
+      "QalaPluginManager\\": "includes/classes"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "QalaPluginManager\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "style:check": "./dependencies/vendor/bin/phpcs -s --extensions=php .",
+    "style:fix": "./dependencies/vendor/bin/phpcbf --extensions=php .",
+    "document:hooks": "./dependencies/vendor/bin/wp-documentor parse ./ --output=hooks.md --format=markdown --exclude=woocommerce --exclude=vendor --exclude=node_modules",
+    "init:grumphp": "php ./dependencies/vendor/bin/grumphp git:init",
+    "test:grumphp": "php ./dependencies/vendor/bin/grumphp run",
+    "test:phpstan": "./dependencies/vendor/bin/phpstan analyse --memory-limit=516M",
+    "test:unit": "./dependencies/vendor/bin/phpunit --testsuite=unit",
+    "test:integration": "./dependencies/vendor/bin/phpunit --testsuite=integration",
+    "test:phpunit": "./dependencies/vendor/bin/phpunit",
+    "lint": [
+      "@style:check"
+    ],
+    "commit": [
+      "@lint",
+      "@test"
+    ],
+    "test": [
+      "@test:phpstan",
+      "@test:grumphp",
+      "@test:unit"
+    ],
+    "document": [
+      "@document:hooks"
+    ],
+    "make-pot": "wp i18n make-pot ./ ./languages/qala-plugin-manager.pot"
+  },
+  "licence": "proprietary"
+}

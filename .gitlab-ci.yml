@@ -1,0 +1,36 @@
+stages:
+  - test
+  - build
+
+.Base:
+  image: docker.synotio.se/synotio/httpd_php70_gulp:latest
+
+build:
+  extends: .Base
+  stage: build
+  only:
+    refs:
+      - master
+  script:
+    - composer install --optimize-autoloader --no-dev
+    - git add ./dependencies/vendor -f
+    - /bin/bash /docker/pluginhelper.sh $(php dependencies/scripts/tag-number.php)
+
+Codesniffer:
+  extends: .Base
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - composer install --optimize-autoloader
+    - dependencies/scripts/run-codesniffer.sh
+
+PHPStan:
+  extends: .Base
+  stage: test
+  only:
+    - merge_requests
+  script:
+    - composer install --optimize-autoloader
+    - php dependencies/vendor/bin/phpstan analyse --no-progress --memory-limit=-1
+    #- php dependencies/vendor/bin/grumphp run --tasks=phpstan

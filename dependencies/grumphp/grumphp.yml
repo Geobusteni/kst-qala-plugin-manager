@@ -1,0 +1,16 @@
+grumphp:
+    environment:
+        paths:
+            - dependencies/vendor/bin
+    tasks:
+        phpcs: ~
+        composer:
+            file: ./composer.json
+            no_check_publish: true
+        phpstan:
+          memory_limit: "-1"
+          configuration: ./phpstan.neon
+          use_grumphp_paths: true
+    ascii:
+        failed: dependencies/grumphp/error.txt
+        succeeded: dependencies/grumphp/all-good.txt

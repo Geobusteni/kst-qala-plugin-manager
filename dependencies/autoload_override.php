@@ -1,0 +1,1 @@
+/root/gits/kst-qala-plugin-manager/dependencies/vendor/autoload.php

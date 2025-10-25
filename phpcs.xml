@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<ruleset name="qala-plugin-manager">
+    <description>Qala Plugin Manager rules for PHP_CodeSniffer with WordPress VIP standards</description>
+
+    <exclude-pattern>node_modules/*</exclude-pattern>
+    <exclude-pattern>dependencies/vendor/*</exclude-pattern>
+    <exclude-pattern>dist/*</exclude-pattern>
+
+    <!-- WordPress-Extra: Core WordPress coding standards -->
+    <rule ref="WordPress-Extra">
+      <!-- PSR4: Allow PSR-4 file naming convention -->
+      <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+      <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+       <!-- Don't enforce yoda conditions -->
+      <exclude name="WordPress.PHP.YodaConditions"/>
+      <exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
+      <!-- Allow short ternary operators -->
+      <exclude name="WordPress.PHP.DisallowShortTernary"/>
+      <!-- Allow short array syntax -->
+      <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+    </rule>
+
+    <!-- WordPress-Docs: Documentation standards -->
+    <rule ref="WordPress-Docs">
+      <exclude name="Generic.Commenting.DocComment.ShortNotCapital"/>
+      <exclude name="Squiz.Commenting.FunctionComment.MissingParamComment"/>
+    </rule>
+
+    <!-- WordPress-VIP-Go: WordPress VIP platform standards -->
+    <rule ref="WordPress-VIP-Go">
+      <!-- PSR4: Allow PSR-4 file naming (already excluded above, but explicit here for VIP) -->
+      <exclude name="WordPress.Files.FileName.InvalidClassFileName"/>
+      <exclude name="WordPress.Files.FileName.NotHyphenatedLowercase"/>
+
+      <!-- Yoda Conditions: Maintain our preference against Yoda conditions -->
+      <exclude name="WordPress.PHP.YodaConditions"/>
+      <exclude name="WordPress.PHP.YodaConditions.NotYoda"/>
+
+      <!-- Short Ternary: Allow short ternary syntax -->
+      <exclude name="WordPress.PHP.DisallowShortTernary"/>
+
+      <!-- Array Syntax: We enforce short array syntax, not long -->
+      <exclude name="Generic.Arrays.DisallowShortArraySyntax"/>
+
+      <!-- WordPress.WP.AlternativeFunctions: VIP prefers wp_safe_redirect over wp_redirect,
+           but we'll handle this on a case-by-case basis as our code may have valid uses -->
+      <exclude name="WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents"/>
+
+      <!-- WordPress.VIP.RestrictedFunctions: These are overly strict for our use case.
+           We're not on VIP platform but want to follow best practices where reasonable -->
+      <exclude name="WordPress.VIP.RestrictedFunctions.switch_to_blog_switch_to_blog"/>
+      <exclude name="WordPress.VIP.RestrictedFunctions.get_posts_get_posts"/>
+      <exclude name="WordPress.VIP.RestrictedFunctions.get_pages_get_pages"/>
+
+      <!-- WordPress.VIP.RestrictedVariables: Allow use of $wpdb where appropriate
+           VIP restricts direct $wpdb usage, but we need it for legitimate queries -->
+      <exclude name="WordPress.VIP.RestrictedVariables.cache_constraints___SERVER__REMOTE_ADDR__"/>
+
+      <!-- WordPress.VIP.SessionFunctionsUsage: Sessions are restricted on VIP,
+           but we may use them in non-VIP environments -->
+      <exclude name="WordPress.VIP.SessionFunctionsUsage.session_session_start"/>
+
+      <!-- WordPress.VIP.FileSystemWritesDisallow: VIP doesn't allow filesystem writes,
+           but we're not on VIP platform -->
+      <exclude name="WordPress.VIP.FileSystemWritesDisallow"/>
+
+      <!-- WordPress.VIP.AdminBarRemoval: VIP doesn't allow removing admin bar,
+           but this may be needed for specific use cases -->
+      <exclude name="WordPress.VIP.AdminBarRemoval.RemovalDetected"/>
+
+      <!-- WordPress.PHP.StrictInArray: VIP enforces strict comparisons in in_array,
+           which is good practice, but we'll handle case-by-case -->
+      <exclude name="WordPress.PHP.StrictInArray.MissingTrueStrict"/>
+
+      <!-- WordPress.Security.ValidatedSanitizedInput: Sometimes we need more control
+           over validation/sanitization logic than the strict VIP rules allow -->
+      <!-- We keep this enabled but may add inline ignores where justified -->
+
+      <!-- WordPress.DB.DirectDatabaseQuery: VIP discourages direct DB queries,
+           but we use them appropriately with caching -->
+      <exclude name="WordPress.DB.DirectDatabaseQuery.DirectQuery"/>
+      <exclude name="WordPress.DB.DirectDatabaseQuery.NoCaching"/>
+    </rule>
+
+    <!-- Allow our own naming convention using / as delimiter for hook names -->
+    <rule ref="WordPress.NamingConventions.ValidHookName">
+      <properties>
+        <property name="additionalWordDelimiters" value="/"/>
+      </properties>
+    </rule>
+
+    <!-- Don't whine about empty files -->
+    <rule ref="Internal.NoCodeFound">
+        <severity>0</severity>
+    </rule>
+
+    <!-- Enforce short array syntax: [] instead of array() -->
+    <rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
+
+    <!-- Disallow Yoda conditions: $foo === $bar, not $bar === $foo -->
+    <rule ref="Generic.ControlStructures.DisallowYodaConditions"/>
+</ruleset>
