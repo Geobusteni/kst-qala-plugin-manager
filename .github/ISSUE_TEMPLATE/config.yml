@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentation
+    url: https://github.com/Geobusteni/kst-qala-plugin-manager/blob/main/README.md
+    about: Read the plugin documentation for usage instructions
+  - name: Changelog
+    url: https://github.com/Geobusteni/kst-qala-plugin-manager/blob/main/CHANGELOG.md
+    about: See what's new in each release
