@@ -43,6 +43,7 @@ div[class*="-notice"],
 }
 
 /* Show allowlisted notices - add data attribute support */
+/* IMPORTANT: Must have equal or higher specificity than hide rules */
 .notice[data-qala-show="true"],
 .updated[data-qala-show="true"],
 .update-nag[data-qala-show="true"],
@@ -54,6 +55,9 @@ div[class*="-notice"],
 div[id^="message"][data-qala-show="true"],
 div[class*="woocommerce-message"][data-qala-show="true"],
 div[class*="-notice"][data-qala-show="true"],
-.update-message[data-qala-show="true"] {
+.update-message[data-qala-show="true"],
+#ajax-response .notice[data-qala-show="true"],
+#ajax-response .updated[data-qala-show="true"],
+#ajax-response > div[data-qala-show="true"] {
     display: block !important;
 }

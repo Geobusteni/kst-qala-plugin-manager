@@ -63,6 +63,7 @@ body.qala-notices-hidden #ajax-response > div {
 }
 
 /* Allow specific notices to show even when hidden (allowlist support) */
+/* IMPORTANT: These rules must have higher specificity than the hide rules above */
 body.qala-notices-hidden .notice[data-qala-show="true"],
 body.qala-notices-hidden .updated[data-qala-show="true"],
 body.qala-notices-hidden .update-nag[data-qala-show="true"],
@@ -74,7 +75,10 @@ body.qala-notices-hidden .notice-info[data-qala-show="true"],
 body.qala-notices-hidden div[id^="message"][data-qala-show="true"],
 body.qala-notices-hidden div[class*="woocommerce-message"][data-qala-show="true"],
 body.qala-notices-hidden div[class*="-notice"][data-qala-show="true"],
-body.qala-notices-hidden .update-message[data-qala-show="true"] {
+body.qala-notices-hidden .update-message[data-qala-show="true"],
+body.qala-notices-hidden #ajax-response .notice[data-qala-show="true"],
+body.qala-notices-hidden #ajax-response .updated[data-qala-show="true"],
+body.qala-notices-hidden #ajax-response > div[data-qala-show="true"] {
     display: block !important;
 }
 
