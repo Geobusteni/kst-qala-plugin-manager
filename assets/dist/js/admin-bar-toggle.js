@@ -1,7 +1,7 @@
 /**
  * Qala Plugin Manager - admin-bar-toggle.js
  * Version: 1.0.0
- * Built: 2025-10-26 05:58:46
+ * Built: 2025-10-26 07:08:37
  */
 /**
 * Admin Bar Toggle - AJAX Handler

@@ -289,8 +289,11 @@ window.QalaPluginManager.noticesVisible = function() {
 		 * Bind event handlers
 		 */
 		bindEvents: function () {
+			console.log('Qala Admin Page: Binding events...');
+
 			// Add pattern button click
 			$('#qala-add-pattern-btn').on('click', this.handleAddPattern.bind(this));
+			console.log('Qala Admin Page: Bound click handler to #qala-add-pattern-btn');
 
 			// Add pattern on Enter key
 			$('#qala-new-pattern').on('keypress', function (e) {
@@ -305,12 +308,16 @@ window.QalaPluginManager.noticesVisible = function() {
 
 			// Remove from allowlist
 			$(document).on('click', '.qala-remove-from-allowlist', this.handleRemovePattern.bind(this));
+
+			console.log('Qala Admin Page: All events bound');
 		},
 
 		/**
 		 * Handle add pattern button click
 		 */
 		handleAddPattern: function (e) {
+			console.log('Qala Admin Page: handleAddPattern called', e);
+
 			if (e) {
 				e.preventDefault();
 			}
@@ -320,8 +327,11 @@ window.QalaPluginManager.noticesVisible = function() {
 			const $button = $('#qala-add-pattern-btn');
 			const $message = $('#qala-add-pattern-message');
 
+			console.log('Qala Admin Page: Pattern:', pattern, 'Type:', patternType);
+
 			// Validate input
 			if (!pattern) {
+				console.log('Qala Admin Page: Empty pattern - showing error');
 				this.showMessage($message, qalaAdminPage.strings.emptyPattern, 'error');
 				return;
 			}
@@ -491,9 +501,18 @@ window.QalaPluginManager.noticesVisible = function() {
 	 * Initialize on document ready
 	 */
 	$(document).ready(function () {
+		// Debug logging
+		console.log('Qala Admin Page: Document ready');
+		console.log('Qala Admin Page: qalaAdminPage defined?', typeof qalaAdminPage !== 'undefined');
+		console.log('Qala Admin Page: Add button exists?', $('#qala-add-pattern-btn').length > 0);
+
 		// Only initialize if we're on the admin page
 		if (typeof qalaAdminPage !== 'undefined') {
+			console.log('Qala Admin Page: Initializing...');
 			QalaAdminPage.init();
+			console.log('Qala Admin Page: Initialized successfully');
+		} else {
+			console.log('Qala Admin Page: qalaAdminPage not defined - skipping initialization');
 		}
 	});
 

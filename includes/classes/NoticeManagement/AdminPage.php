@@ -292,11 +292,11 @@ class AdminPage implements WithHooksInterface {
 								type="text"
 								id="qala-new-pattern"
 								class="regular-text"
-								placeholder="<?php esc_attr_e( 'e.g., rocket_* or MyClass::method', 'qala-plugin-manager' ); ?>"
+								placeholder="<?php esc_attr_e( 'e.g., rocket_*, *Category added*, MyClass::method', 'qala-plugin-manager' ); ?>"
 							/>
 							<select id="qala-pattern-type">
 								<option value="exact"><?php esc_html_e( 'Exact Match', 'qala-plugin-manager' ); ?></option>
-								<option value="wildcard"><?php esc_html_e( 'Wildcard (*)', 'qala-plugin-manager' ); ?></option>
+								<option value="wildcard" selected><?php esc_html_e( 'Wildcard (*)', 'qala-plugin-manager' ); ?></option>
 								<option value="regex"><?php esc_html_e( 'Regex', 'qala-plugin-manager' ); ?></option>
 							</select>
 							<button type="button" id="qala-add-pattern-btn" class="button button-primary">
@@ -304,6 +304,20 @@ class AdminPage implements WithHooksInterface {
 							</button>
 						</div>
 						<div id="qala-add-pattern-message" class="qala-message" style="display: none;"></div>
+						<p class="description">
+							<?php
+							esc_html_e( 'Pattern types:', 'qala-plugin-manager' );
+							?>
+							<br>
+							<strong><?php esc_html_e( 'Wildcard:', 'qala-plugin-manager' ); ?></strong>
+							<?php esc_html_e( 'Use * to match any characters. Example: *Category added* matches any notice containing "Category added"', 'qala-plugin-manager' ); ?>
+							<br>
+							<strong><?php esc_html_e( 'Exact:', 'qala-plugin-manager' ); ?></strong>
+							<?php esc_html_e( 'Matches the exact callback name. Example: MyClass::my_notice_function', 'qala-plugin-manager' ); ?>
+							<br>
+							<strong><?php esc_html_e( 'Regex:', 'qala-plugin-manager' ); ?></strong>
+							<?php esc_html_e( 'Advanced pattern matching using regular expressions', 'qala-plugin-manager' ); ?>
+						</p>
 					</div>
 
 					<!-- Existing Patterns List -->
