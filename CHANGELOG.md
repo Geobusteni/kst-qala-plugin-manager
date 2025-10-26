@@ -5,6 +5,34 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.9] - 2025-10-26
+
+### Fixed
+- **CSS Specificity for AJAX Notices**: Fixed allowlisted AJAX notices not being shown
+  - Added specific selectors for `#ajax-response` notices in show rules
+  - Increased CSS specificity to match or exceed hide rules
+  - Notices with `data-qala-show="true"` now properly display
+
+### Technical Details
+- **Problem**: Hide rule `#ajax-response > div` had specificity (0,2,2)
+- **Issue**: Show rule `.notice[data-qala-show="true"]` had lower specificity (0,2,1)
+- **Result**: Hide rule won, notices stayed hidden despite JavaScript attribute
+- **Fix**: Added `#ajax-response > div[data-qala-show="true"]` selector (0,2,2)
+- **Impact**: Allowlisted AJAX notices now properly shown
+
+### CSS Specificity Changes
+- Added `body.qala-notices-hidden #ajax-response .notice[data-qala-show="true"]`
+- Added `body.qala-notices-hidden #ajax-response .updated[data-qala-show="true"]`
+- Added `body.qala-notices-hidden #ajax-response > div[data-qala-show="true"]`
+
+### Complete Flow Now Working
+1. User triggers AJAX action (e.g., add category)
+2. WordPress injects notice into `#ajax-response`
+3. MutationObserver detects new notice (v1.0.8)
+4. JavaScript checks text against allowlist patterns (v1.0.7)
+5. JavaScript adds `data-qala-show="true"` attribute (v1.0.7)
+6. CSS shows the notice (v1.0.9 - THIS FIX!)
+
 ## [1.0.8] - 2025-10-26
 
 ### Fixed
