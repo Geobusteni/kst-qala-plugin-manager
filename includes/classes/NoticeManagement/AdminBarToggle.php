@@ -83,8 +83,8 @@ class AdminBarToggle implements WithHooksInterface {
 		// Add menu item to admin bar (priority 999 = very late)
 		add_action( 'admin_bar_menu', [ $this, 'add_admin_bar_menu' ], 999 );
 
-		// Enqueue assets for AJAX functionality
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		// Enqueue assets for AJAX functionality (priority 5 = early, before AdminPage localization)
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ], 5 );
 
 		// Register AJAX handler for toggle
 		add_action( 'wp_ajax_' . self::AJAX_ACTION, [ $this, 'handle_toggle_ajax' ] );
