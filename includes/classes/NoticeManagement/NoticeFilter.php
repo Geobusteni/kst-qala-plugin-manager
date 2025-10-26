@@ -82,12 +82,19 @@ class NoticeFilter implements WithHooksInterface {
 	 *
 	 * Hook Registration:
 	 * - in_admin_header @ priority 100000: Remove notice hooks before they fire
+	 * - admin_enqueue_scripts @ priority 1: Enqueue CSS to hide notices (fallback)
+	 *
+	 * The CSS approach provides a bulletproof fallback for notices that bypass
+	 * the hook system (e.g., WooCommerce HTTPS notice, AJAX notices).
 	 *
 	 * @return void
 	 */
 	public function init(): void {
 		// Main hook: Filter notices at latest possible moment before they render
 		add_action( 'in_admin_header', [ $this, 'filter_notices' ], 100000 );
+
+		// CSS fallback: Enqueue hiding CSS at highest priority
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_hiding_css' ], 1 );
 	}
 
 	/**
@@ -311,5 +318,76 @@ class NoticeFilter implements WithHooksInterface {
 			$action,
 			$reason
 		);
+	}
+
+	/**
+	 * Enqueue CSS to hide notices
+	 *
+	 * This method provides a CSS-based "nuclear" approach to hiding notices.
+	 * It works as a bulletproof fallback for notices that bypass the hook system,
+	 * such as WooCommerce HTTPS notices and AJAX-injected notices.
+	 *
+	 * The CSS is only enqueued if notices should be hidden based on:
+	 * 1. User does NOT have qala_full_access capability
+	 * 2. Global toggle is disabled (no)
+	 * 3. User toggle is disabled (no) or not set
+	 *
+	 * Priority 1 ensures CSS loads before most other admin styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_hiding_css(): void {
+		// Only enqueue if user should NOT see notices
+		if ( $this->should_hide_notices() ) {
+			$css_path = \QalaPluginManager\Plugin::get_path() . '/assets/dist/css/notice-hider.css';
+			$css_url = \QalaPluginManager\Plugin::get_url() . '/assets/dist/css/notice-hider.css';
+
+			wp_enqueue_style(
+				'qala-notice-hider',
+				$css_url,
+				[],
+				file_exists( $css_path ) ? filemtime( $css_path ) : '1.0.0'
+			);
+
+			error_log( 'NoticeFilter: Enqueued notice-hider.css (nuclear mode)' );
+		}
+	}
+
+	/**
+	 * Determine if notices should be hidden
+	 *
+	 * This method contains the same logic as filter_notices() but returns
+	 * a boolean instead of executing filtering.
+	 *
+	 * Notices should be HIDDEN if:
+	 * 1. User does NOT have qala_full_access capability
+	 * 2. Global toggle is disabled (no)
+	 * 3. User toggle is disabled (no) or not set
+	 *
+	 * @return bool True if notices should be hidden, false otherwise.
+	 */
+	private function should_hide_notices(): bool {
+		$current_user_id = get_current_user_id();
+		$has_capability = $this->user_has_capability( 'qala_full_access' );
+		$global_toggle = get_option( 'qala_notices_enabled', 'yes' );
+		$user_toggle = get_user_meta( $current_user_id, 'qala_show_notices', true );
+
+		// Show notices (don't hide) if user has qala_full_access capability
+		if ( $has_capability ) {
+			return false;
+		}
+
+		// Show notices (don't hide) if global toggle is enabled (yes)
+		if ( $global_toggle === 'yes' ) {
+			return false;
+		}
+
+		// Show notices (don't hide) if user wants to see them
+		if ( $user_toggle === 'yes' ) {
+			return false;
+		}
+
+		// All conditions met - hide notices
+		return true;
 	}
 }

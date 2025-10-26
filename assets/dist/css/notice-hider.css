@@ -1,0 +1,6 @@
+/**
+ * Notice Hider CSS - Nuclear Approach (Minified)
+ * @package QalaPluginManager
+ * @subpackage NoticeManagement
+ */
+.notice,.updated,.update-nag,.error,.notice-error,.notice-warning,.notice-success,.notice-info,div[id^="message"],div[class*="woocommerce-message"],div[class*="-notice"],.update-message{display:none!important}.notice[data-qala-show="true"],.updated[data-qala-show="true"],.update-nag[data-qala-show="true"],.error[data-qala-show="true"],.notice-error[data-qala-show="true"],.notice-warning[data-qala-show="true"],.notice-success[data-qala-show="true"],.notice-info[data-qala-show="true"],div[id^="message"][data-qala-show="true"],div[class*="woocommerce-message"][data-qala-show="true"],div[class*="-notice"][data-qala-show="true"],.update-message[data-qala-show="true"]{display:block!important}
