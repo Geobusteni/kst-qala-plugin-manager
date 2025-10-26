@@ -5,6 +5,64 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.8] - 2025-10-26
+
+### Fixed
+- **AJAX Notice Detection**: Fixed timing issues with AJAX-injected notices
+  - Category creation notices now properly detected and shown
+  - Post update notices now work correctly
+  - Any AJAX-injected notice now detected in real-time
+
+### Added
+- **MutationObserver Integration**: Real-time DOM monitoring for notice detection
+  - Detects new notices the moment they're added to the page
+  - No delays or guessing - event-driven approach
+  - Works regardless of AJAX timing
+  - Processes notices immediately when added
+
+- **Smart Processing**: Prevents duplicate processing
+  - `data-qala-processed` attribute marks processed notices
+  - Skips already-processed notices on subsequent scans
+  - More efficient and cleaner console output
+
+- **Enhanced Logging**: Better debugging information
+  - Shows text being checked for each notice
+  - ✓ symbol indicates successful matches
+  - Counts new vs already-processed notices
+  - Logs when MutationObserver detects new notices
+
+### Changed
+- **Detection Strategy**: Multiple layers for maximum reliability
+  - Primary: MutationObserver (real-time, event-driven)
+  - Fallback: Timeouts at 500ms, 1500ms, 3000ms
+  - Initial: DOMContentLoaded scan
+
+### Technical Details
+- **MutationObserver Configuration**:
+  - Observes: `document.body`
+  - Options: `{childList: true, subtree: true}`
+  - Triggers: When elements with notice classes added
+  - Delay: 100ms after detection for DOM stability
+
+- **Performance**:
+  - Native browser API (very efficient)
+  - Only processes new notices
+  - No polling or continuous checking
+  - Event-driven architecture
+
+- **Browser Support**:
+  - MutationObserver: IE11+, all modern browsers
+  - Fully compatible with WordPress admin
+
+### Console Output Example
+```
+Qala Content Matcher: MutationObserver started - watching for AJAX notices
+Qala Content Matcher: New notices detected via MutationObserver
+Qala Content Matcher: Checking notice - Category added.
+Qala Content Matcher: ✓ MATCHED - Category added.
+Qala Content Matcher: Matched 1 new notices
+```
+
 ## [1.0.7] - 2025-10-26
 
 ### Fixed
