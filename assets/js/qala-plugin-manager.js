@@ -210,10 +210,31 @@ window.QalaPluginManager.noticesVisible = function() {
 
 		/**
 		 * Check if text matches regex pattern
+		 *
+		 * Handles patterns with or without delimiters:
+		 * - With delimiters: /pattern/flags (e.g., /\b(added)\b/i)
+		 * - Without delimiters: pattern (e.g., \b(added)\b)
 		 */
 		matchesRegex: function(text, pattern) {
 			try {
-				const regex = new RegExp(pattern, 'i');
+				let regexPattern = pattern;
+				let flags = 'i'; // Default to case-insensitive
+
+				// Check if pattern has regex delimiters (starts and ends with /)
+				const delimiterMatch = pattern.match(/^\/(.*)\/([gimsuvy]*)$/);
+
+				if (delimiterMatch) {
+					// Pattern has delimiters: extract pattern body and flags
+					regexPattern = delimiterMatch[1];
+					const patternFlags = delimiterMatch[2];
+
+					// Combine user flags with default 'i' flag (case-insensitive)
+					// Remove duplicates by converting to Set
+					const combinedFlags = [...new Set((patternFlags + 'i').split(''))].join('');
+					flags = combinedFlags;
+				}
+
+				const regex = new RegExp(regexPattern, flags);
 				return regex.test(text);
 			} catch (e) {
 				console.error('Qala Content Matcher: Invalid regex pattern', pattern, e);

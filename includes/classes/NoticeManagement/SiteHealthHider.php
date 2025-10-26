@@ -49,7 +49,7 @@ class SiteHealthHider implements WithHooksInterface {
 	/**
 	 * Remove Site Health menu page for users without qala_full_access
 	 *
-	 * Removes the "Site Health" menu item from Tools menu.
+	 * Removes the "Site Health" submenu item from Tools menu.
 	 * Only affects users WITHOUT qala_full_access capability.
 	 *
 	 * Hook: admin_menu (priority 999)
@@ -67,8 +67,9 @@ class SiteHealthHider implements WithHooksInterface {
 			return;
 		}
 
-		// Remove Site Health menu page
-		remove_menu_page( 'site-health.php' );
+		// Remove Site Health submenu from Tools menu
+		// Site Health is a submenu item under Tools, not a top-level menu
+		remove_submenu_page( 'tools.php', 'site-health.php' );
 	}
 
 	/**

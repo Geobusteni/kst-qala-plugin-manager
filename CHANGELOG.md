@@ -5,6 +5,45 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.10] - 2025-10-26
+
+### Fixed
+- **Regex Pattern Matching**: Fixed regex patterns not working in allowlist (Issue #5)
+  - JavaScript now properly parses regex patterns with delimiters and flags
+  - Patterns like `/\b(added|updated)\b/i` now work correctly
+  - Extracts pattern body and flags from delimiter format `/pattern/flags`
+  - Combines user flags with default case-insensitive flag
+  - Falls back to treating pattern as raw regex if no delimiters found
+
+- **Site Health Menu Visibility**: Fixed Site Health menu visible to non-qala users (Issue #4)
+  - Changed from `remove_menu_page()` to `remove_submenu_page()`
+  - Site Health is a submenu under Tools, not a top-level menu
+  - Menu item now properly hidden for users without `qala_full_access` capability
+
+### Technical Details
+
+#### Regex Pattern Fix
+- **Problem**: `new RegExp('/pattern/flags', 'i')` created invalid regex
+- **Root Cause**: JavaScript received full pattern string including delimiters
+- **Solution**: Parse pattern to extract body and flags separately
+- **Implementation**:
+  - Match pattern against `/^\/(.*)\/([gimsuvy]*)$/`
+  - Extract pattern body from capture group 1
+  - Extract flags from capture group 2
+  - Combine with default 'i' flag, removing duplicates
+  - Create RegExp with clean pattern and combined flags
+
+#### Site Health Menu Fix
+- **Problem**: `remove_menu_page('site-health.php')` didn't remove submenu
+- **WordPress Behavior**: Site Health is registered as submenu under Tools
+- **Solution**: `remove_submenu_page('tools.php', 'site-health.php')`
+- **Impact**: Menu item properly hidden, redirect still works
+
+### Files Modified
+- `assets/js/qala-plugin-manager.js` - Enhanced `matchesRegex()` function
+- `includes/classes/NoticeManagement/SiteHealthHider.php` - Fixed menu removal
+- `index.php` - Version bump to 1.0.10
+
 ## [1.0.9] - 2025-10-26
 
 ### Fixed
