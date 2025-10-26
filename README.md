@@ -190,25 +190,25 @@ Disable notice hiding entirely:
 
 Users with this capability have full access:
 
-- ✅ See all notices (can toggle per-user)
-- ✅ Access Settings > Hide Notices page
-- ✅ Manage allowlist patterns
-- ✅ View notice logs
-- ✅ Use admin bar toggle
-- ✅ Access Site Health page
-- ✅ See Site Health dashboard widget
+- See all notices (can toggle per-user)
+- Access Settings > Hide Notices page
+- Manage allowlist patterns
+- View notice logs
+- Use admin bar toggle
+- Access Site Health page
+- See Site Health dashboard widget
 
 ### Without qala_full_access
 
 Users without this capability:
 
-- ❌ Cannot see any admin notices
-- ❌ Cannot access settings page
-- ❌ Cannot manage allowlist
-- ❌ Cannot toggle notice visibility
-- ❌ Cannot access Site Health page
-- ❌ Cannot see Site Health widget
-- ❌ Redirected to Dashboard if trying direct access
+- Cannot see any admin notices
+- Cannot access settings page
+- Cannot manage allowlist
+- Cannot toggle notice visibility
+- Cannot access Site Health page
+- Cannot see Site Health widget
+- Redirected to Dashboard if trying direct access
 
 ## Technical Details
 
@@ -244,13 +244,13 @@ The plugin hooks into `in_admin_header` at priority 100000 (latest possible timi
 
 ### Security
 
-- ✅ Nonce verification on all forms/AJAX
-- ✅ Capability checking (qala_full_access)
-- ✅ Input sanitization
-- ✅ Output escaping
-- ✅ SQL injection prevention (prepared statements)
-- ✅ XSS prevention
-- ✅ CSRF protection
+- Nonce verification on all forms/AJAX
+- Capability checking (qala_full_access)
+- Input sanitization
+- Output escaping
+- SQL injection prevention (prepared statements)
+- XSS prevention
+- CSRF protection
 
 ## Troubleshooting
 
