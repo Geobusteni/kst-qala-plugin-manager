@@ -93,9 +93,9 @@ class ServiceProvider {
 		$identifier = new NoticeManagement\NoticeIdentifier();
 		$logger = new NoticeManagement\NoticeLogger();
 		$allowlist = new NoticeManagement\AllowlistManager();
-		$body_class = new NoticeManagement\BodyClassManager();
 
 		// Step 3: Create components with dependencies
+		$body_class = new NoticeManagement\BodyClassManager( $allowlist );
 		$filter = new NoticeManagement\NoticeFilter( $allowlist, $logger, $identifier );
 		$admin_page = new NoticeManagement\AdminPage( $allowlist, $logger );
 		$admin_bar = new NoticeManagement\AdminBarToggle();

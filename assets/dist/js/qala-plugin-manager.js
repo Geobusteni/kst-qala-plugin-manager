@@ -52,6 +52,177 @@ window.QalaPluginManager.noticesVisible = function() {
 	return document.body.classList.contains('qala-notices-visible');
 };
 
+/* ===== Notice Content Matching (Allowlist) ===== */
+
+/**
+ * Notice Content Matcher
+ *
+ * This module checks notice text content against allowlist patterns and shows
+ * matching notices even when they're hidden by CSS.
+ *
+ * Problem:
+ * - Allowlist patterns match PHP callback names (e.g., "my_plugin_notice")
+ * - Users want to match notice TEXT content (e.g., "Category added")
+ * - Hook-based filtering can't match content, only callback names
+ *
+ * Solution:
+ * - JavaScript checks actual notice DOM text against patterns
+ * - Adds data-qala-show="true" attribute to matching notices
+ * - CSS already has rules to show notices with this attribute
+ *
+ * @package QalaPluginManager
+ */
+(function() {
+	'use strict';
+
+	const NoticeContentMatcher = {
+
+		/**
+		 * Initialize content matching
+		 */
+		init: function() {
+			// Only run if notices are hidden
+			if (!window.QalaPluginManager.noticesHidden()) {
+				console.log('Qala Content Matcher: Notices not hidden - skipping');
+				return;
+			}
+
+			// Only run if allowlist patterns are available
+			if (typeof qalaAllowlistPatterns === 'undefined' || !qalaAllowlistPatterns.patterns) {
+				console.log('Qala Content Matcher: No allowlist patterns defined');
+				return;
+			}
+
+			console.log('Qala Content Matcher: Initializing with', qalaAllowlistPatterns.patterns.length, 'patterns');
+			this.processNotices();
+		},
+
+		/**
+		 * Process all hidden notices and show matching ones
+		 */
+		processNotices: function() {
+			const selectors = [
+				'.notice',
+				'.updated',
+				'.update-nag',
+				'.error',
+				'div[id^="message"]',
+				'div[class*="-notice"]',
+				'#ajax-response .notice',
+				'#ajax-response > div'
+			];
+
+			const notices = document.querySelectorAll(selectors.join(', '));
+			console.log('Qala Content Matcher: Found', notices.length, 'notice elements');
+
+			let matchedCount = 0;
+
+			notices.forEach((notice) => {
+				const text = this.getNoticeText(notice);
+				if (this.matchesAnyPattern(text)) {
+					notice.setAttribute('data-qala-show', 'true');
+					matchedCount++;
+					console.log('Qala Content Matcher: MATCHED -', text.substring(0, 50));
+				}
+			});
+
+			console.log('Qala Content Matcher: Matched', matchedCount, 'notices');
+		},
+
+		/**
+		 * Get text content from notice element
+		 */
+		getNoticeText: function(element) {
+			return element.textContent || element.innerText || '';
+		},
+
+		/**
+		 * Check if text matches any allowlist pattern
+		 */
+		matchesAnyPattern: function(text) {
+			if (!text) {
+				return false;
+			}
+
+			for (let i = 0; i < qalaAllowlistPatterns.patterns.length; i++) {
+				const pattern = qalaAllowlistPatterns.patterns[i];
+				if (this.matchesPattern(text, pattern.value, pattern.type)) {
+					return true;
+				}
+			}
+
+			return false;
+		},
+
+		/**
+		 * Check if text matches a specific pattern
+		 */
+		matchesPattern: function(text, patternValue, patternType) {
+			switch (patternType) {
+				case 'exact':
+					return text === patternValue;
+
+				case 'wildcard':
+					return this.matchesWildcard(text, patternValue);
+
+				case 'regex':
+					return this.matchesRegex(text, patternValue);
+
+				default:
+					return false;
+			}
+		},
+
+		/**
+		 * Check if text matches wildcard pattern
+		 *
+		 * Converts wildcard pattern to regex.
+		 * Example: "*Category added*" becomes /^.*Category added.*$/
+		 */
+		matchesWildcard: function(text, pattern) {
+			// Escape special regex characters except asterisk
+			const escaped = pattern.replace(/[.+?^${}()|[\]\\]/g, '\\$&');
+
+			// Convert asterisk to .*
+			const regex = new RegExp('^' + escaped.replace(/\*/g, '.*') + '$', 'i');
+
+			return regex.test(text);
+		},
+
+		/**
+		 * Check if text matches regex pattern
+		 */
+		matchesRegex: function(text, pattern) {
+			try {
+				const regex = new RegExp(pattern, 'i');
+				return regex.test(text);
+			} catch (e) {
+				console.error('Qala Content Matcher: Invalid regex pattern', pattern, e);
+				return false;
+			}
+		}
+	};
+
+	// Initialize when DOM is ready
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', function() {
+			NoticeContentMatcher.init();
+		});
+	} else {
+		// DOM already loaded
+		NoticeContentMatcher.init();
+	}
+
+	// Also run after a short delay to catch AJAX-injected notices
+	setTimeout(function() {
+		NoticeContentMatcher.processNotices();
+	}, 500);
+
+	// Expose for manual triggering if needed
+	window.QalaPluginManager.NoticeContentMatcher = NoticeContentMatcher;
+
+})();
+
 /* ===== Admin Bar Toggle ===== */
 
 /**

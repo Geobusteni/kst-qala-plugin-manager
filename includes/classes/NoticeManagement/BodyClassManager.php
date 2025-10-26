@@ -42,14 +42,32 @@ class BodyClassManager implements WithHooksInterface {
 	use CapabilityChecker;
 
 	/**
+	 * AllowlistManager instance for pattern access
+	 *
+	 * @var AllowlistManager
+	 */
+	private $allowlist;
+
+	/**
+	 * Constructor
+	 *
+	 * @param AllowlistManager $allowlist Allowlist manager instance.
+	 */
+	public function __construct( AllowlistManager $allowlist ) {
+		$this->allowlist = $allowlist;
+	}
+
+	/**
 	 * Initialize hooks
 	 *
 	 * Registers the admin_body_class filter to add CSS classes.
+	 * Also localizes allowlist patterns for JavaScript content matching.
 	 *
 	 * @return void
 	 */
 	public function init(): void {
 		add_filter( 'admin_body_class', [ $this, 'add_body_classes' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'localize_allowlist_patterns' ], 15 );
 	}
 
 	/**
@@ -115,5 +133,57 @@ class BodyClassManager implements WithHooksInterface {
 		}
 
 		return false; // Hide by default for non-privileged users
+	}
+
+	/**
+	 * Localize allowlist patterns for JavaScript
+	 *
+	 * Provides allowlist patterns to JavaScript for client-side notice content matching.
+	 * This allows JavaScript to check notice text content against patterns and show
+	 * matching notices even when they're hidden by CSS.
+	 *
+	 * Priority 15 ensures this runs after script is enqueued (priority 5) and
+	 * after other localizations (priority 10).
+	 *
+	 * @return void
+	 */
+	public function localize_allowlist_patterns(): void {
+		// Only localize if notices are hidden
+		if ( ! $this->should_hide_notices() ) {
+			return;
+		}
+
+		// Get all allowlist patterns
+		$patterns = $this->allowlist->get_all_patterns();
+
+		// Prepare patterns for JavaScript
+		$js_patterns = [];
+		foreach ( $patterns as $pattern ) {
+			$js_patterns[] = [
+				'value' => $pattern['pattern_value'],
+				'type' => $pattern['pattern_type'],
+			];
+		}
+
+		// Localize for JavaScript
+		wp_localize_script(
+			'qala-plugin-manager',
+			'qalaAllowlistPatterns',
+			[
+				'patterns' => $js_patterns,
+				'enabled' => true,
+			]
+		);
+	}
+
+	/**
+	 * Determine if notices should be hidden
+	 *
+	 * Inverse of should_show_notices() for clarity in some contexts.
+	 *
+	 * @return bool True if notices should be hidden, false if shown.
+	 */
+	private function should_hide_notices(): bool {
+		return ! $this->should_show_notices();
 	}
 }
