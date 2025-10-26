@@ -114,17 +114,26 @@ class AdminBarToggle implements WithHooksInterface {
 		$user_preference = $this->get_user_preference();
 		$is_showing = ( $user_preference === 'yes' );
 
-		// Build menu title with state indicator
-		$state_text = $is_showing ? __( 'On', 'qala-plugin-manager' ) : __( 'Off', 'qala-plugin-manager' );
-		$state_class = $is_showing ? 'qala-state-on' : 'qala-state-off';
+		// Build menu title with clear action-oriented text
+		// When showing: "Click to HIDE notices"
+		// When hidden: "Click to SHOW notices"
+		if ( $is_showing ) {
+			$state_text = __( 'Showing - Click to Hide', 'qala-plugin-manager' );
+			$state_class = 'qala-state-on';
+			$icon_class = 'dashicons-visibility';
+		} else {
+			$state_text = __( 'Hidden - Click to Show', 'qala-plugin-manager' );
+			$state_class = 'qala-state-off';
+			$icon_class = 'dashicons-hidden';
+		}
 
 		$title = sprintf(
 			'<span class="qala-notice-toggle-wrapper">
-				<span class="dashicons dashicons-visibility qala-toggle-icon"></span>
-				<span class="qala-toggle-label">%s: </span>
+				<span class="dashicons %s qala-toggle-icon"></span>
+				<span class="qala-toggle-label">Notices: </span>
 				<span class="qala-toggle-state %s">%s</span>
 			</span>',
-			esc_html__( 'Notices', 'qala-plugin-manager' ),
+			esc_attr( $icon_class ),
 			esc_attr( $state_class ),
 			esc_html( $state_text )
 		);

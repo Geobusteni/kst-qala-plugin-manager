@@ -35,7 +35,10 @@
 div[id^="message"],
 div[class*="woocommerce-message"],
 div[class*="-notice"],
-.update-message {
+.update-message,
+#ajax-response .notice,
+#ajax-response .updated,
+#ajax-response > div {
     display: none !important;
 }
 
