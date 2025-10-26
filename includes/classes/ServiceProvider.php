@@ -72,10 +72,11 @@ class ServiceProvider {
 	 * 2. NoticeIdentifier - No dependencies
 	 * 3. NoticeLogger - No dependencies
 	 * 4. AllowlistManager - No dependencies
-	 * 5. NoticeFilter - Depends on AllowlistManager, NoticeLogger, NoticeIdentifier
-	 * 6. AdminPage - Depends on AllowlistManager, NoticeLogger
-	 * 7. AdminBarToggle - No dependencies
-	 * 8. SiteHealthHider - No dependencies
+	 * 5. BodyClassManager - No dependencies (adds CSS classes to body tag)
+	 * 6. NoticeFilter - Depends on AllowlistManager, NoticeLogger, NoticeIdentifier
+	 * 7. AdminPage - Depends on AllowlistManager, NoticeLogger
+	 * 8. AdminBarToggle - No dependencies
+	 * 9. SiteHealthHider - No dependencies
 	 *
 	 * @return array Array of instantiated Notice Management components
 	 */
@@ -92,6 +93,7 @@ class ServiceProvider {
 		$identifier = new NoticeManagement\NoticeIdentifier();
 		$logger = new NoticeManagement\NoticeLogger();
 		$allowlist = new NoticeManagement\AllowlistManager();
+		$body_class = new NoticeManagement\BodyClassManager();
 
 		// Step 3: Create components with dependencies
 		$filter = new NoticeManagement\NoticeFilter( $allowlist, $logger, $identifier );
@@ -101,6 +103,7 @@ class ServiceProvider {
 
 		// Store for reuse
 		$this->notice_components = [
+			$body_class,
 			$filter,
 			$admin_page,
 			$admin_bar,

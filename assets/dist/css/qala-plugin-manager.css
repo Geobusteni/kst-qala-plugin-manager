@@ -1,0 +1,726 @@
+/**
+ * Qala Plugin Manager - Combined CSS
+ *
+ * This file combines all CSS assets for better performance.
+ * Loaded globally on all admin pages.
+ *
+ * @package QalaPluginManager
+ */
+
+/* ===== Notice Hider Styles ===== */
+
+/**
+ * Notice Hider CSS - Body Class Approach
+ *
+ * This CSS file provides bulletproof hiding of ALL admin notices in WordPress
+ * using body classes to control visibility. The BodyClassManager adds classes
+ * to the body tag based on user capabilities and preferences.
+ *
+ * Strategy:
+ * 1. Hide notices ONLY when body has qala-notices-hidden class
+ * 2. CSS is always loaded (no conditional logic)
+ * 3. Body classes control visibility (clean, performant)
+ * 4. Support data attribute to show allowlisted notices
+ * 5. Cover all possible notice classes and patterns
+ *
+ * Body Classes (added by BodyClassManager):
+ * - qala-notices-hidden: Notices should be hidden
+ * - qala-notices-visible: Notices should be visible
+ * - qala-has-full-access: User has qala_full_access capability
+ * - qala-no-full-access: User doesn't have capability
+ *
+ * Coverage:
+ * - Standard WordPress notices (.notice, .updated, .error)
+ * - Update nag messages (.update-nag)
+ * - All notice type variants (.notice-error, .notice-warning, etc.)
+ * - Generic message divs (div[id^="message"])
+ * - WooCommerce notices (div[class*="woocommerce-message"])
+ * - Generic notice patterns (div[class*="-notice"])
+ * - Update messages (.update-message)
+ * - AJAX-injected notices (covered by class matching)
+ *
+ * @package QalaPluginManager
+ * @subpackage NoticeManagement
+ */
+
+/* Hide notices by default only when body has qala-notices-hidden class */
+body.qala-notices-hidden .notice,
+body.qala-notices-hidden .updated,
+body.qala-notices-hidden .update-nag,
+body.qala-notices-hidden .error,
+body.qala-notices-hidden .notice-error,
+body.qala-notices-hidden .notice-warning,
+body.qala-notices-hidden .notice-success,
+body.qala-notices-hidden .notice-info,
+body.qala-notices-hidden div[id^="message"],
+body.qala-notices-hidden div[class*="woocommerce-message"],
+body.qala-notices-hidden div[class*="-notice"],
+body.qala-notices-hidden .update-message,
+body.qala-notices-hidden #ajax-response .notice,
+body.qala-notices-hidden #ajax-response .updated,
+body.qala-notices-hidden #ajax-response > div {
+    display: none !important;
+}
+
+/* Allow specific notices to show even when hidden (allowlist support) */
+body.qala-notices-hidden .notice[data-qala-show="true"],
+body.qala-notices-hidden .updated[data-qala-show="true"],
+body.qala-notices-hidden .update-nag[data-qala-show="true"],
+body.qala-notices-hidden .error[data-qala-show="true"],
+body.qala-notices-hidden .notice-error[data-qala-show="true"],
+body.qala-notices-hidden .notice-warning[data-qala-show="true"],
+body.qala-notices-hidden .notice-success[data-qala-show="true"],
+body.qala-notices-hidden .notice-info[data-qala-show="true"],
+body.qala-notices-hidden div[id^="message"][data-qala-show="true"],
+body.qala-notices-hidden div[class*="woocommerce-message"][data-qala-show="true"],
+body.qala-notices-hidden div[class*="-notice"][data-qala-show="true"],
+body.qala-notices-hidden .update-message[data-qala-show="true"] {
+    display: block !important;
+}
+
+/* ===== Admin Bar Toggle Styles ===== */
+
+/**
+ * Admin Bar Toggle Styles
+ *
+ * Styling for the admin bar notice visibility toggle.
+ * Provides visual feedback for different states and smooth transitions.
+ *
+ * Features:
+ * - State indicators (on/off colors)
+ * - Loading animation
+ * - Hover effects
+ * - Icon styling
+ * - Responsive design
+ *
+ * @package QalaPluginManager
+ * @since 1.0.0
+ */
+
+/**
+ * Base admin bar toggle item styling
+ */
+#wp-admin-bar-qala-notice-toggle {
+	position: relative;
+}
+
+#wp-admin-bar-qala-notice-toggle a {
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+#wp-admin-bar-qala-notice-toggle a:hover {
+	background-color: rgba(255, 255, 255, 0.1);
+}
+
+/**
+ * Toggle wrapper layout
+ */
+.qala-notice-toggle-wrapper {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+}
+
+/**
+ * Icon styling
+ */
+.qala-toggle-icon {
+	font-size: 16px;
+	width: 16px;
+	height: 16px;
+	vertical-align: middle;
+}
+
+/**
+ * Label styling
+ */
+.qala-toggle-label {
+	font-weight: 400;
+}
+
+/**
+ * State indicator styling
+ */
+.qala-toggle-state {
+	font-weight: 600;
+	padding: 2px 6px;
+	border-radius: 3px;
+	transition: all 0.3s ease;
+}
+
+/**
+ * "On" state (notices visible) - Green
+ */
+.qala-toggle-state.qala-state-on {
+	color: #46b450;
+	background-color: rgba(70, 180, 80, 0.1);
+}
+
+#wp-admin-bar-qala-notice-toggle:hover .qala-toggle-state.qala-state-on {
+	background-color: rgba(70, 180, 80, 0.2);
+}
+
+/**
+ * "Off" state (notices hidden) - Red
+ */
+.qala-toggle-state.qala-state-off {
+	color: #dc3232;
+	background-color: rgba(220, 50, 50, 0.1);
+}
+
+#wp-admin-bar-qala-notice-toggle:hover .qala-toggle-state.qala-state-off {
+	background-color: rgba(220, 50, 50, 0.2);
+}
+
+/**
+ * Loading state animation
+ */
+.qala-notice-toggle-wrapper.qala-loading {
+	opacity: 0.6;
+}
+
+.qala-notice-toggle-wrapper.qala-loading .qala-toggle-icon {
+	animation: qala-rotate 1s linear infinite;
+}
+
+.qala-notice-toggle-wrapper.qala-loading .qala-toggle-state {
+	color: #666;
+	background-color: rgba(0, 0, 0, 0.05);
+}
+
+/**
+ * Rotate animation for loading state
+ */
+@keyframes qala-rotate {
+	from {
+		transform: rotate(0deg);
+	}
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/**
+ * AJAX notice styling
+ */
+.qala-ajax-notice {
+	margin: 20px 0 10px;
+	animation: qala-slide-in 0.3s ease-out;
+}
+
+.qala-ajax-notice p {
+	margin: 0.5em 0;
+}
+
+/**
+ * Slide-in animation for notices
+ */
+@keyframes qala-slide-in {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/**
+ * Accessibility improvements
+ */
+#wp-admin-bar-qala-notice-toggle a:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: -2px;
+}
+
+/**
+ * Responsive adjustments for smaller screens
+ */
+@media screen and (max-width: 782px) {
+	.qala-toggle-label {
+		display: none; /* Hide "Notices:" label on mobile */
+	}
+
+	.qala-toggle-state {
+		padding: 4px 8px;
+		font-size: 14px;
+	}
+
+	.qala-toggle-icon {
+		font-size: 18px;
+		width: 18px;
+		height: 18px;
+	}
+}
+
+@media screen and (max-width: 600px) {
+	/* Further simplification on very small screens */
+	.qala-notice-toggle-wrapper {
+		gap: 2px;
+	}
+
+	.qala-toggle-state {
+		padding: 2px 4px;
+		font-size: 12px;
+	}
+}
+
+/**
+ * High contrast mode support
+ */
+@media (prefers-contrast: high) {
+	.qala-toggle-state.qala-state-on {
+		border: 1px solid #46b450;
+	}
+
+	.qala-toggle-state.qala-state-off {
+		border: 1px solid #dc3232;
+	}
+}
+
+/**
+ * Reduced motion support
+ */
+@media (prefers-reduced-motion: reduce) {
+	.qala-toggle-state,
+	#wp-admin-bar-qala-notice-toggle a,
+	.qala-ajax-notice {
+		transition: none;
+		animation: none;
+	}
+
+	.qala-notice-toggle-wrapper.qala-loading .qala-toggle-icon {
+		animation: none;
+	}
+}
+
+/**
+ * Dark mode support
+ */
+@media (prefers-color-scheme: dark) {
+	.qala-toggle-state.qala-state-on {
+		color: #5fd164;
+		background-color: rgba(95, 209, 100, 0.15);
+	}
+
+	.qala-toggle-state.qala-state-off {
+		color: #ff6b6b;
+		background-color: rgba(255, 107, 107, 0.15);
+	}
+
+	.qala-notice-toggle-wrapper.qala-loading .qala-toggle-state {
+		color: #aaa;
+		background-color: rgba(255, 255, 255, 0.05);
+	}
+}
+
+/* ===== Admin Page Styles ===== */
+
+/**
+ * Qala Admin Page Styles
+ *
+ * Styles for the Hide Notices settings page.
+ * Provides clean, WordPress-native styling with responsive design.
+ *
+ * @package QalaPluginManager
+ */
+
+/* ==========================================================================
+   Main Container
+   ========================================================================== */
+
+.qala-admin-page {
+	max-width: 1400px;
+}
+
+.qala-admin-page h1 {
+	margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   Content Grid Layout
+   ========================================================================== */
+
+.qala-content-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 30px;
+	margin-top: 30px;
+}
+
+@media (min-width: 1200px) {
+	.qala-content-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+.qala-section {
+	background: #fff;
+	border: 1px solid #ccd0d4;
+	border-radius: 4px;
+	padding: 20px;
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+
+.qala-section h2 {
+	margin-top: 0;
+	margin-bottom: 15px;
+	font-size: 18px;
+	font-weight: 600;
+	color: #23282d;
+	border-bottom: 1px solid #e5e5e5;
+	padding-bottom: 10px;
+}
+
+.qala-section h3 {
+	font-size: 15px;
+	margin-top: 20px;
+	margin-bottom: 10px;
+}
+
+.qala-section > .description {
+	margin-bottom: 15px;
+	color: #646970;
+}
+
+/* ==========================================================================
+   Notice Log Table
+   ========================================================================== */
+
+.qala-notice-log table {
+	margin-top: 15px;
+}
+
+.qala-notice-log table code {
+	background: #f0f0f1;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 12px;
+	color: #d63638;
+}
+
+.qala-notice-log table th {
+	font-weight: 600;
+}
+
+.qala-notice-log table td {
+	vertical-align: middle;
+}
+
+.qala-notice-log .button {
+	padding: 4px 10px;
+	height: auto;
+	line-height: 1.5;
+	font-size: 13px;
+}
+
+/* ==========================================================================
+   Allowlist Section
+   ========================================================================== */
+
+.qala-allowlist {
+	/* Full width on mobile, half on desktop */
+}
+
+/* Add Pattern Form */
+.qala-add-pattern-form {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	border-radius: 4px;
+	padding: 15px;
+	margin-bottom: 20px;
+}
+
+.qala-add-pattern-form h3 {
+	margin-top: 0;
+	margin-bottom: 10px;
+	font-size: 14px;
+}
+
+.qala-form-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: center;
+}
+
+.qala-form-row input[type="text"] {
+	flex: 1;
+	min-width: 200px;
+}
+
+.qala-form-row select {
+	min-width: 120px;
+}
+
+/* Patterns Table */
+.qala-patterns-table {
+	margin-top: 15px;
+}
+
+.qala-patterns-table code {
+	background: #f0f0f1;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 12px;
+	color: #2271b1;
+}
+
+.qala-pattern-type {
+	display: inline-block;
+	padding: 2px 8px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+}
+
+.qala-type-exact {
+	background: #dff0d8;
+	color: #3c763d;
+}
+
+.qala-type-wildcard {
+	background: #d9edf7;
+	color: #31708f;
+}
+
+.qala-type-regex {
+	background: #fcf8e3;
+	color: #8a6d3b;
+}
+
+/* ==========================================================================
+   Messages
+   ========================================================================== */
+
+.qala-message {
+	margin-top: 10px;
+	padding: 10px 15px;
+	border-left: 4px solid;
+	border-radius: 3px;
+	font-size: 14px;
+}
+
+.qala-message.success {
+	background: #d4edda;
+	border-color: #28a745;
+	color: #155724;
+}
+
+.qala-message.error {
+	background: #f8d7da;
+	border-color: #dc3545;
+	color: #721c24;
+}
+
+.qala-message.info {
+	background: #d1ecf1;
+	border-color: #17a2b8;
+	color: #0c5460;
+}
+
+/* ==========================================================================
+   Action Status Badges
+   ========================================================================== */
+
+.qala-action-removed {
+	display: inline-block;
+	padding: 2px 8px;
+	background: #f8d7da;
+	color: #721c24;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+.qala-action-kept_allowlisted {
+	display: inline-block;
+	padding: 2px 8px;
+	background: #d4edda;
+	color: #155724;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+}
+
+/* ==========================================================================
+   Loading States
+   ========================================================================== */
+
+.qala-loading {
+	opacity: 0.6;
+	pointer-events: none;
+	position: relative;
+}
+
+.qala-loading::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	width: 20px;
+	height: 20px;
+	margin: -10px 0 0 -10px;
+	border: 2px solid #2271b1;
+	border-radius: 50%;
+	border-top-color: transparent;
+	animation: qala-spin 0.6s linear infinite;
+}
+
+@keyframes qala-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.qala-add-to-allowlist,
+.qala-remove-from-allowlist {
+	cursor: pointer;
+}
+
+.qala-add-to-allowlist:hover,
+.qala-remove-from-allowlist:hover {
+	opacity: 0.8;
+}
+
+.qala-remove-from-allowlist {
+	color: #b32d2e;
+}
+
+.qala-remove-from-allowlist:hover {
+	color: #dc3232;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	.qala-content-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.qala-form-row {
+		flex-direction: column;
+	}
+
+	.qala-form-row input[type="text"],
+	.qala-form-row select,
+	.qala-form-row button {
+		width: 100%;
+	}
+
+	.qala-notice-log table,
+	.qala-patterns-table {
+		font-size: 13px;
+	}
+
+	.qala-notice-log table code,
+	.qala-patterns-table code {
+		font-size: 11px;
+	}
+}
+
+/* ==========================================================================
+   WordPress Admin Overrides
+   ========================================================================== */
+
+.qala-admin-page .form-table th {
+	width: auto;
+	padding-left: 0;
+}
+
+.qala-admin-page .form-table td {
+	padding-right: 0;
+}
+
+/* ==========================================================================
+   Empty States
+   ========================================================================== */
+
+.qala-section > p > em {
+	color: #646970;
+	font-style: normal;
+}
+
+/* ==========================================================================
+   Table Enhancements
+   ========================================================================== */
+
+.qala-notice-log .wp-list-table tr:hover td,
+.qala-patterns-table tr:hover td {
+	background-color: #f6f7f7;
+}
+
+.qala-notice-log .wp-list-table th,
+.qala-patterns-table th {
+	background-color: #f6f7f7;
+	font-weight: 600;
+	border-bottom: 1px solid #c3c4c7;
+}
+
+/* ==========================================================================
+   Accessibility
+   ========================================================================== */
+
+.qala-add-to-allowlist:focus,
+.qala-remove-from-allowlist:focus,
+#qala-add-pattern-btn:focus {
+	outline: 2px solid #2271b1;
+	outline-offset: 2px;
+	box-shadow: none;
+}
+
+/* ==========================================================================
+   Settings Form
+   ========================================================================== */
+
+.qala-admin-page .form-table {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.qala-admin-page .form-table input[type="checkbox"] {
+	margin-right: 8px;
+}
+
+.qala-admin-page .form-table .description {
+	margin-top: 5px;
+	color: #646970;
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.qala-hidden {
+	display: none !important;
+}
+
+.qala-text-center {
+	text-align: center;
+}
+
+.qala-text-muted {
+	color: #646970;
+}
+
+.qala-mt-20 {
+	margin-top: 20px;
+}
+
+.qala-mb-20 {
+	margin-bottom: 20px;
+}

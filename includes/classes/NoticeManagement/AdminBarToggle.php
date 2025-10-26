@@ -153,10 +153,14 @@ class AdminBarToggle implements WithHooksInterface {
 	}
 
 	/**
-	 * Enqueue JavaScript and CSS assets
+	 * Enqueue JavaScript assets and localize
 	 *
-	 * Enqueues the JavaScript file for AJAX toggle functionality and
-	 * the CSS file for styling the admin bar menu item.
+	 * Enqueues the combined qala-plugin-manager.js file which includes:
+	 * - Admin bar toggle functionality
+	 * - Admin page functionality
+	 *
+	 * This JavaScript is loaded on ALL admin pages for optimal performance
+	 * and simpler asset management.
 	 *
 	 * Also localizes the script with:
 	 * - AJAX URL
@@ -167,36 +171,21 @@ class AdminBarToggle implements WithHooksInterface {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		// Get plugin URL and directory for asset paths
-		$plugin_url = plugin_dir_url( dirname( dirname( dirname( __FILE__ ) ) ) );
-		$plugin_dir = dirname( dirname( dirname( __FILE__ ) ) );
+		$js_path = \QalaPluginManager\Plugin::get_path() . '/assets/dist/js/qala-plugin-manager.js';
+		$js_url = \QalaPluginManager\Plugin::get_url() . '/assets/dist/js/qala-plugin-manager.js';
 
-		// Get file modification time for cache busting
-		$css_file = $plugin_dir . '/assets/dist/css/admin-bar-toggle.css';
-		$js_file = $plugin_dir . '/assets/dist/js/admin-bar-toggle.js';
-		$css_version = file_exists( $css_file ) ? filemtime( $css_file ) : '1.0.0';
-		$js_version = file_exists( $js_file ) ? filemtime( $js_file ) : '1.0.0';
-
-		// Enqueue JavaScript for AJAX toggle
+		// Enqueue combined JavaScript
 		wp_enqueue_script(
-			'qala-admin-bar-toggle',
-			$plugin_url . 'assets/dist/js/admin-bar-toggle.js',
+			'qala-plugin-manager',
+			$js_url,
 			[ 'jquery' ],
-			$js_version,
+			file_exists( $js_path ) ? filemtime( $js_path ) : '1.0.3',
 			true
 		);
 
-		// Enqueue CSS for styling
-		wp_enqueue_style(
-			'qala-admin-bar-toggle',
-			$plugin_url . 'assets/dist/css/admin-bar-toggle.css',
-			[],
-			$css_version
-		);
-
-		// Localize script with AJAX data and translations
+		// Localize script with AJAX data and translations for admin bar toggle
 		wp_localize_script(
-			'qala-admin-bar-toggle',
+			'qala-plugin-manager',
 			'qalaAdminBarToggle',
 			[
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),

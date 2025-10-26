@@ -82,8 +82,8 @@ class AdminPage implements WithHooksInterface {
 		// Register settings using WordPress Settings API
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 
-		// Enqueue CSS and JavaScript assets
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+		// Localize script for admin page (CSS/JS already loaded globally)
+		add_action( 'admin_enqueue_scripts', [ $this, 'localize_script' ] );
 
 		// AJAX handlers
 		add_action( 'wp_ajax_qala_add_allowlist_pattern', [ $this, 'handle_add_pattern_ajax' ] );
@@ -348,52 +348,25 @@ class AdminPage implements WithHooksInterface {
 	}
 
 	/**
-	 * Enqueue CSS and JavaScript assets
+	 * Localize script for admin page
 	 *
-	 * Only enqueues on the settings page.
-	 * Includes:
-	 * - Admin page stylesheet
-	 * - AJAX handling JavaScript
-	 * - Localized script data (nonces, AJAX URL)
+	 * Provides AJAX data and translations for the admin page JavaScript.
+	 * Note: The combined CSS/JS files are already loaded globally by other classes.
+	 *
+	 * Only localizes on the settings page to avoid unnecessary data on other pages.
 	 *
 	 * @param string $hook Current page hook.
 	 * @return void
 	 */
-	public function enqueue_assets( string $hook ): void {
-		// Only enqueue on our settings page
+	public function localize_script( string $hook ): void {
+		// Only localize on our settings page
 		if ( $hook !== 'settings_page_qala-hide-notices' ) {
 			return;
 		}
 
-		$plugin_url = plugin_dir_url( dirname( dirname( dirname( __FILE__ ) ) ) );
-		$plugin_dir = dirname( dirname( dirname( __FILE__ ) ) );
-
-		// Get file modification time for cache busting
-		$css_file = $plugin_dir . '/assets/dist/css/admin-page.css';
-		$js_file = $plugin_dir . '/assets/dist/js/admin-page.js';
-		$css_version = file_exists( $css_file ) ? filemtime( $css_file ) : '1.0.0';
-		$js_version = file_exists( $js_file ) ? filemtime( $js_file ) : '1.0.0';
-
-		// Enqueue CSS
-		wp_enqueue_style(
-			'qala-admin-page',
-			$plugin_url . 'assets/dist/css/admin-page.css',
-			[],
-			$css_version
-		);
-
-		// Enqueue JavaScript
-		wp_enqueue_script(
-			'qala-admin-page',
-			$plugin_url . 'assets/dist/js/admin-page.js',
-			[ 'jquery' ],
-			$js_version,
-			true
-		);
-
-		// Localize script with AJAX data
+		// Localize script with AJAX data for admin page functionality
 		wp_localize_script(
-			'qala-admin-page',
+			'qala-plugin-manager',
 			'qalaAdminPage',
 			[
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
