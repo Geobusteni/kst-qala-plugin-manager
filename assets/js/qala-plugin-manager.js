@@ -165,7 +165,11 @@ window.QalaPluginManager.noticesVisible = function() {
 
 			for (let i = 0; i < qalaAllowlistPatterns.patterns.length; i++) {
 				const pattern = qalaAllowlistPatterns.patterns[i];
-				if (this.matchesPattern(text, pattern.value, pattern.type)) {
+				console.log('Qala Content Matcher: Testing pattern', pattern.value, 'type:', pattern.type, 'against text:', text.substring(0, 80));
+				const result = this.matchesPattern(text, pattern.value, pattern.type);
+				console.log('Qala Content Matcher: Pattern match result:', result);
+				if (result) {
+					console.log('Qala Content Matcher: Pattern MATCHED!');
 					return true;
 				}
 			}
@@ -220,6 +224,8 @@ window.QalaPluginManager.noticesVisible = function() {
 				let regexPattern = pattern;
 				let flags = 'i'; // Default to case-insensitive
 
+				console.log('Qala Content Matcher: matchesRegex - Original pattern:', pattern);
+
 				// Check if pattern has regex delimiters (starts and ends with /)
 				const delimiterMatch = pattern.match(/^\/(.*)\/([gimsuvy]*)$/);
 
@@ -228,14 +234,23 @@ window.QalaPluginManager.noticesVisible = function() {
 					regexPattern = delimiterMatch[1];
 					const patternFlags = delimiterMatch[2];
 
+					console.log('Qala Content Matcher: Extracted pattern body:', regexPattern);
+					console.log('Qala Content Matcher: Extracted flags:', patternFlags);
+
 					// Combine user flags with default 'i' flag (case-insensitive)
 					// Remove duplicates by converting to Set
 					const combinedFlags = [...new Set((patternFlags + 'i').split(''))].join('');
 					flags = combinedFlags;
+					console.log('Qala Content Matcher: Combined flags:', flags);
+				} else {
+					console.log('Qala Content Matcher: No delimiters found, using pattern as-is');
 				}
 
 				const regex = new RegExp(regexPattern, flags);
-				return regex.test(text);
+				console.log('Qala Content Matcher: Created regex:', regex);
+				const result = regex.test(text);
+				console.log('Qala Content Matcher: Regex test result:', result);
+				return result;
 			} catch (e) {
 				console.error('Qala Content Matcher: Invalid regex pattern', pattern, e);
 				return false;
