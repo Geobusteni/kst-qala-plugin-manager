@@ -5,6 +5,49 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.7] - 2025-10-26
+
+### Fixed
+- **CRITICAL: Wildcard Allowlist Patterns Not Working**: Fixed content-based matching (Fixes #3)
+  - Allowlist patterns now match notice TEXT CONTENT, not just PHP callback names
+  - Pattern `*Category added*` now correctly shows notices containing "Category added"
+  - Works with AJAX-injected notices (category creation, post updates, etc.)
+  - JavaScript scans notice DOM and checks text against all allowlist patterns
+
+### Added
+- **JavaScript Content Matcher**: Client-side notice content matching system
+  - `NoticeContentMatcher` module checks notice text against patterns
+  - Supports exact, wildcard, and regex pattern matching
+  - Case-insensitive matching for better user experience
+  - Automatic re-processing after 500ms to catch AJAX notices
+  - Console logging for debugging matched notices
+  - Exposed as `window.QalaPluginManager.NoticeContentMatcher`
+
+- **Pattern Localization**: Allowlist patterns now available to JavaScript
+  - `BodyClassManager` localizes patterns via `wp_localize_script`
+  - Patterns exposed as `qalaAllowlistPatterns` global variable
+  - Only loads when notices are hidden (optimization)
+
+### Changed
+- **BodyClassManager**: Now requires `AllowlistManager` dependency
+  - Constructor updated to accept `AllowlistManager` instance
+  - New `localize_allowlist_patterns()` method at priority 15
+  - ServiceProvider updated to inject dependency
+
+### Technical Details
+- **Pattern Matching Logic**:
+  - Wildcard: `*text*` matches any notice containing "text"
+  - Exact: `text` matches notice with exactly "text"
+  - Regex: `/pattern/i` for advanced matching
+- **Performance**:
+  - Patterns only localized when notices hidden
+  - Single DOM scan on page load + one after 500ms
+  - No performance impact when notices visible
+- **Compatibility**:
+  - Works with all WordPress notice types
+  - Compatible with AJAX-injected notices
+  - Uses existing `data-qala-show="true"` CSS infrastructure
+
 ## [1.0.6] - 2025-10-26
 
 ### Fixed
