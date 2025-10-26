@@ -5,6 +5,89 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5] - 2025-10-26
+
+### Fixed
+- **Allowlist Pattern UX**: Improved user experience for adding wildcard patterns (Fixes #1)
+  - Updated placeholder text to show clear wildcard example: `*Category added*`
+  - Changed default pattern type to "Wildcard (*)" for common use case
+  - Added comprehensive help text explaining all pattern types with examples
+  - Clarified that wildcards require asterisks around text to match
+
+### Added
+- **Debug Logging**: Added console logging to JavaScript for troubleshooting
+  - Logs initialization, event binding, and AJAX calls
+  - Helps diagnose issues with pattern addition
+- **GitHub Issue Templates**: Created comprehensive issue reporting templates
+  - Bug report template with environment details and reproduction steps
+  - Feature request template with use case and priority levels
+  - Question/help template for support requests
+  - Template configuration with documentation links
+
+### Documentation
+- Improved wildcard pattern documentation with clear examples
+- Added inline help text on admin page explaining pattern matching behavior
+
+## [1.0.4] - 2025-10-26
+
+### Added
+- **Body Class System**: Implements conditional notice visibility via CSS classes
+  - Adds `qala-notices-hidden`, `qala-notices-visible`, `qala-has-full-access`, `qala-no-full-access` classes
+  - Assets now always load (no conditional logic)
+  - Better separation of concerns (PHP adds classes, CSS/JS react)
+
+### Changed
+- **Asset Consolidation**: Combined all CSS and JS into single files
+  - `qala-plugin-manager.css` - All styles in one file
+  - `qala-plugin-manager.js` - All scripts in one file
+  - Better performance with fewer HTTP requests
+- **CSS Scoping**: Notice hiding rules now scoped to `body.qala-notices-hidden`
+- **JavaScript Helpers**: Added global helpers for capability detection
+  - `window.QalaPluginManager.hasFullAccess()`
+  - `window.QalaPluginManager.noticesHidden()`
+  - `window.QalaPluginManager.noticesVisible()`
+
+### Fixed
+- More reliable notice hiding for AJAX-injected notices
+- Improved asset loading strategy for better performance
+
+## [1.0.3] - 2025-10-26
+
+### Fixed
+- **AJAX Notice Hiding**: Added specific selectors for AJAX-injected notices
+  - `#ajax-response .notice` - Category creation notices
+  - `#ajax-response > div` - Direct children of AJAX response container
+- **Admin Bar Toggle Text**: Changed to action-oriented text
+  - "Notices: Showing - Click to Hide" (with eye icon)
+  - "Notices: Hidden - Click to Show" (with hidden icon)
+  - Clearer understanding of current state and available action
+
+## [1.0.2] - 2025-10-26
+
+### Added
+- **CSS-Based Hiding**: Implemented bulletproof CSS fallback for notice hiding
+  - `notice-hider.css` with `display: none !important` rules
+  - Covers all notice types and patterns
+  - Works as secondary defense layer
+
+### Fixed
+- **Hook Removal Insufficient**: Hook removal wasn't catching all notices
+  - WooCommerce notices rendered in templates (bypass hooks)
+  - AJAX notices injected via JavaScript (bypass hooks)
+  - CSS-based hiding now handles these edge cases
+
+## [1.0.1] - 2025-10-26
+
+### Fixed
+- **NoticeFilter Logic Inversion**: Fixed backwards boolean check in filter_notices()
+  - Line 140: Changed from checking `=== 'no'` to `=== 'yes'`
+  - Notices now properly hide when global toggle is disabled
+- **Missing Production Dependencies**: Added vendor/ folder to production zip
+  - Ran `composer install --no-dev --optimize-autoloader`
+  - Included `dependencies/vendor/autoload.php` in release
+- **Emojis Removed**: Removed 21 emoji characters from documentation
+  - Replaced with text equivalents for professional appearance
+
 ## [1.0.0] - 2025-10-25
 
 ### Added - Hide Notices Feature
