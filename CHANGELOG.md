@@ -5,6 +5,21 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.6] - 2025-10-26
+
+### Fixed
+- **CRITICAL: Add Pattern Button Not Working**: Fixed admin page localization issue (Fixes #2)
+  - AdminPage JavaScript was not initializing because `qalaAdminPage` variable was undefined
+  - Root cause: Script localization was attempted before script was enqueued
+  - Changed AdminBarToggle enqueue priority from 10 to 5 to ensure script loads first
+  - Now `qalaAdminPage` variable is properly defined on settings page
+  - Add Pattern button, Remove Pattern, and all AJAX functionality now works correctly
+
+### Technical Details
+- **Hook Priority Order**: AdminBarToggle now enqueues at priority 5, AdminPage localizes at priority 10
+- **Impact**: All admin page AJAX interactions (add/remove patterns, toggle notices) now functional
+- **Console Logging**: Debug logs will now show `qalaAdminPage defined? true` instead of `false`
+
 ## [1.0.5] - 2025-10-26
 
 ### Fixed
