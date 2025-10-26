@@ -116,17 +116,36 @@ window.QalaPluginManager.noticesVisible = function() {
 			console.log('Qala Content Matcher: Found', notices.length, 'notice elements');
 
 			let matchedCount = 0;
+			let alreadyProcessed = 0;
 
 			notices.forEach((notice) => {
+				// Skip if already processed
+				if (notice.hasAttribute('data-qala-processed')) {
+					alreadyProcessed++;
+					return;
+				}
+
+				// Mark as processed to avoid reprocessing
+				notice.setAttribute('data-qala-processed', 'true');
+
 				const text = this.getNoticeText(notice);
+
+				// Only log non-empty text
+				if (text && text.trim()) {
+					console.log('Qala Content Matcher: Checking notice -', text.substring(0, 80));
+				}
+
 				if (this.matchesAnyPattern(text)) {
 					notice.setAttribute('data-qala-show', 'true');
 					matchedCount++;
-					console.log('Qala Content Matcher: MATCHED -', text.substring(0, 50));
+					console.log('Qala Content Matcher: ✓ MATCHED -', text.substring(0, 80));
 				}
 			});
 
-			console.log('Qala Content Matcher: Matched', matchedCount, 'notices');
+			if (alreadyProcessed > 0) {
+				console.log('Qala Content Matcher: Skipped', alreadyProcessed, 'already processed notices');
+			}
+			console.log('Qala Content Matcher: Matched', matchedCount, 'new notices');
 		},
 
 		/**
@@ -200,6 +219,86 @@ window.QalaPluginManager.noticesVisible = function() {
 				console.error('Qala Content Matcher: Invalid regex pattern', pattern, e);
 				return false;
 			}
+		},
+
+		/**
+		 * Start MutationObserver to watch for new notices
+		 *
+		 * Uses MutationObserver API to detect when new notices are added to the DOM.
+		 * This is the proper way to handle AJAX-injected notices in real-time.
+		 */
+		startObserver: function() {
+			// Only run if notices are hidden and patterns exist
+			if (!window.QalaPluginManager.noticesHidden()) {
+				return;
+			}
+
+			if (typeof qalaAllowlistPatterns === 'undefined' || !qalaAllowlistPatterns.patterns) {
+				return;
+			}
+
+			// Create observer instance
+			const observer = new MutationObserver((mutations) => {
+				let shouldProcess = false;
+
+				// Check if any mutation added notice-related elements
+				mutations.forEach((mutation) => {
+					if (mutation.addedNodes.length > 0) {
+						mutation.addedNodes.forEach((node) => {
+							// Check if added node is a notice or contains notices
+							if (node.nodeType === 1) { // Element node
+								const isNotice = node.classList && (
+									node.classList.contains('notice') ||
+									node.classList.contains('updated') ||
+									node.classList.contains('error') ||
+									node.id === 'ajax-response'
+								);
+
+								const hasNotices = node.querySelector && (
+									node.querySelector('.notice') ||
+									node.querySelector('.updated') ||
+									node.querySelector('.error') ||
+									node.querySelector('[class*="-notice"]')
+								);
+
+								if (isNotice || hasNotices) {
+									shouldProcess = true;
+								}
+							}
+						});
+					}
+				});
+
+				// Process notices if we detected new ones
+				if (shouldProcess) {
+					console.log('Qala Content Matcher: New notices detected via MutationObserver');
+					// Small delay to ensure DOM is fully updated
+					setTimeout(() => {
+						this.processNotices();
+					}, 100);
+				}
+			});
+
+			// Start observing the document body for child list changes
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true
+			});
+
+			console.log('Qala Content Matcher: MutationObserver started - watching for AJAX notices');
+
+			// Store observer for potential cleanup
+			this.observer = observer;
+		},
+
+		/**
+		 * Stop the MutationObserver
+		 */
+		stopObserver: function() {
+			if (this.observer) {
+				this.observer.disconnect();
+				console.log('Qala Content Matcher: MutationObserver stopped');
+			}
 		}
 	};
 
@@ -207,16 +306,26 @@ window.QalaPluginManager.noticesVisible = function() {
 	if (document.readyState === 'loading') {
 		document.addEventListener('DOMContentLoaded', function() {
 			NoticeContentMatcher.init();
+			NoticeContentMatcher.startObserver();
 		});
 	} else {
 		// DOM already loaded
 		NoticeContentMatcher.init();
+		NoticeContentMatcher.startObserver();
 	}
 
-	// Also run after a short delay to catch AJAX-injected notices
+	// Also run after delays to catch AJAX-injected notices
 	setTimeout(function() {
 		NoticeContentMatcher.processNotices();
 	}, 500);
+
+	setTimeout(function() {
+		NoticeContentMatcher.processNotices();
+	}, 1500);
+
+	setTimeout(function() {
+		NoticeContentMatcher.processNotices();
+	}, 3000);
 
 	// Expose for manual triggering if needed
 	window.QalaPluginManager.NoticeContentMatcher = NoticeContentMatcher;
