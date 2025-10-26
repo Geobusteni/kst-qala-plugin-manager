@@ -5,6 +5,32 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.11] - 2025-10-26
+
+### Added
+- **Debug Logging for Regex Pattern Matching**: Extensive console logging to diagnose Issue #5
+  - Shows which patterns are being tested against notice text
+  - Displays regex pattern parsing steps (delimiter extraction, flags)
+  - Logs regex creation and test results
+  - Helps identify why regex patterns may not be matching
+
+### Technical Details
+This is a debug release to help diagnose why regex patterns are not matching notices.
+Console will show:
+- Pattern value and type being tested
+- Regex delimiter parsing results
+- Final regex object created
+- Test results for each pattern
+
+Users experiencing Issue #5 should:
+1. Open browser console (F12)
+2. Add a test category
+3. Share console output for diagnosis
+
+### Files Modified
+- `assets/js/qala-plugin-manager.js` - Added debug logging to matching functions
+- `index.php` - Version bump to 1.0.11
+
 ## [1.0.10] - 2025-10-26
 
 ### Fixed
