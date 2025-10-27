@@ -39,8 +39,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Build configuration (development only)
-webpack.config.js
-package.json
+# Lock files (generated)
 package-lock.json
 composer.lock
