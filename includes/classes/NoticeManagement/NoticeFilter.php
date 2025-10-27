@@ -335,8 +335,8 @@ class NoticeFilter implements WithHooksInterface {
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
-		$css_path = \QalaPluginManager\Plugin::get_path() . '/assets/dist/css/qala-plugin-manager.css';
-		$css_url = \QalaPluginManager\Plugin::get_url() . '/assets/dist/css/qala-plugin-manager.css';
+		$css_path = \QalaPluginManager\Plugin::get_path() . '/assets/dist/qala-plugin-manager.css';
+		$css_url = \QalaPluginManager\Plugin::get_url() . '/assets/dist/qala-plugin-manager.css';
 
 		wp_enqueue_style(
 			'qala-plugin-manager',

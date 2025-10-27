@@ -5,6 +5,15 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.6] - 2025-10-27
+
+### Fixed
+- **CSS Not Loading**: Fixed CSS file path in NoticeFilter.php (Issue #10)
+  - CSS was not loading in admin despite file existing
+  - Webpack outputs CSS to `assets/dist/qala-plugin-manager.css` (not in `css/` subdirectory)
+  - Updated path from `assets/dist/css/qala-plugin-manager.css` to `assets/dist/qala-plugin-manager.css`
+  - All admin styles now load correctly
+
 ## [2.0.5] - 2025-10-27
 
 ### Changed - BREAKING
