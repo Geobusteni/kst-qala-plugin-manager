@@ -5,6 +5,24 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.1] - 2025-10-27
+
+### Fixed
+- **MU Plugin Support** - Fixed plugin path and URL calculation to work correctly when installed as a must-use (MU) plugin
+  - Plugin now detects if it's running from `mu-plugins` directory and adjusts paths accordingly
+  - Assets (CSS/JS) now load correctly from MU plugins location
+  - Fixes Issue #8: Plugin now works seamlessly in both `plugins/` and `mu-plugins/` directories
+  - Fixes Issue #7: Admin bar toggle and notice hiding now work correctly (was caused by incorrect asset paths in MU plugin mode)
+
+### Technical Details
+- Modified `Plugin.php` to detect WPMU_PLUGIN_DIR and calculate paths dynamically
+- Added conditional logic to use correct WordPress functions based on plugin location
+- Compatible with both regular plugin loaders and MU plugin loaders (e.g., humanmade's)
+
+### Migration
+- No changes required for existing installations
+- Plugin now auto-detects its environment and adjusts accordingly
+
 ## [2.0.0] - 2025-10-27
 
 ### Changed - BREAKING

@@ -61,7 +61,7 @@ cd "$PARENT_DIR"
 
 zip -r "$OUTPUT_FILE" qala-plugin-manager \
   -x "*/node_modules/*" \
-  -x "*/vendor/bin/*" \
+  -x "*/dependencies/vendor/*/*" \
   -x "*/tests/*" \
   -x "*/.git/*" \
   -x "*/.github/*" \

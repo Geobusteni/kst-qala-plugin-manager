@@ -67,10 +67,26 @@ class Plugin {
 				__NAMESPACE__
 			)
 		);
-		// Set some useful variables.
-		self::$plugin_url           = dirname( dirname( untrailingslashit( plugins_url( '/', __FILE__ ) ) ) );
-		self::$plugin_path          = dirname( dirname( untrailingslashit( plugin_dir_path( __FILE__ ) ) ) );
-		self::$plugin_template_path = trailingslashit( dirname( dirname( untrailingslashit( plugin_dir_path( __FILE__ ) ) ) ) ) . 'views';
+			// Set some useful variables.
+		// Calculate paths dynamically to support both regular plugins and MU plugins
+		$plugin_file = dirname( dirname( __FILE__ ) ); // Path to plugin root from includes/classes
+
+		// Determine if running as MU plugin or regular plugin
+		if ( defined( 'WPMU_PLUGIN_DIR' ) && strpos( $plugin_file, WPMU_PLUGIN_DIR ) !== false ) {
+			// Running as MU plugin
+			self::$plugin_path = $plugin_file;
+			self::$plugin_url  = str_replace(
+				untrailingslashit( ABSPATH ),
+				untrailingslashit( site_url() ),
+				$plugin_file
+			);
+		} else {
+			// Running as regular plugin
+			self::$plugin_url  = dirname( dirname( untrailingslashit( plugins_url( '/', __FILE__ ) ) ) );
+			self::$plugin_path = dirname( dirname( untrailingslashit( plugin_dir_path( __FILE__ ) ) ) );
+		}
+
+		self::$plugin_template_path = trailingslashit( self::$plugin_path ) . 'views';
 
 		/**
 		 * Hey there fellow Angryite!
