@@ -35,17 +35,17 @@ trait CapabilityChecker {
 	 * @return bool True if user has capability, false otherwise.
 	 */
 	protected function user_has_capability( string $capability = 'qala_full_access' ): bool {
-		// Must be in admin context
+		// Must be in admin context.
 		if ( ! is_admin() ) {
 			return false;
 		}
 
-		// Must be logged in
+		// Must be logged in.
 		if ( ! is_user_logged_in() ) {
 			return false;
 		}
 
-		// Check capability
+		// Check capability.
 		return current_user_can( $capability );
 	}
 
@@ -72,22 +72,22 @@ trait CapabilityChecker {
 	 * @return bool True if user should see notices, false otherwise.
 	 */
 	protected function should_see_notices(): bool {
-		// Users with qala_full_access always see notices
+		// Users with qala_full_access always see notices.
 		if ( $this->user_has_capability( 'qala_full_access' ) ) {
 			return true;
 		}
 
-		// Check user meta for per-user override
+		// Check user meta for per-user override.
 		$user_id = get_current_user_id();
 
-		// User ID must be valid (not 0)
+		// User ID must be valid (not 0).
 		if ( $user_id === 0 || empty( $user_id ) ) {
 			return false;
 		}
 
 		$user_pref = get_user_meta( $user_id, 'qala_show_notices', true );
 
-		// Only return true if preference is exactly 'yes'
+		// Only return true if preference is exactly 'yes'.
 		return ( $user_pref === 'yes' );
 	}
 
@@ -109,7 +109,7 @@ trait CapabilityChecker {
 			if ( empty( $message ) ) {
 				$message = __( 'You do not have permission to access this page.', 'qala-plugin-manager' );
 			}
-			wp_die( $message );
+			wp_die( esc_html( $message ) );
 		}
 	}
 }

@@ -481,40 +481,40 @@ class CapabilityCheckerTest extends TestCase {
 	 */
 	public function capability_check_edge_cases_provider(): array {
 		return [
-			'not_admin_not_logged_in' => [
-				'is_admin'           => false,
-				'is_user_logged_in'  => false,
-				'current_user_can'   => true,
-				'expected'           => false,
-				'description'        => 'Not in admin and not logged in',
+			'not_admin_not_logged_in'     => [
+				'is_admin'          => false,
+				'is_user_logged_in' => false,
+				'current_user_can'  => true,
+				'expected'          => false,
+				'description'       => 'Not in admin and not logged in',
 			],
-			'admin_not_logged_in' => [
-				'is_admin'           => true,
-				'is_user_logged_in'  => false,
-				'current_user_can'   => true,
-				'expected'           => false,
-				'description'        => 'In admin but not logged in',
+			'admin_not_logged_in'         => [
+				'is_admin'          => true,
+				'is_user_logged_in' => false,
+				'current_user_can'  => true,
+				'expected'          => false,
+				'description'       => 'In admin but not logged in',
 			],
 			'not_admin_logged_in_has_cap' => [
-				'is_admin'           => false,
-				'is_user_logged_in'  => true,
-				'current_user_can'   => true,
-				'expected'           => false,
-				'description'        => 'Logged in with capability but not in admin',
+				'is_admin'          => false,
+				'is_user_logged_in' => true,
+				'current_user_can'  => true,
+				'expected'          => false,
+				'description'       => 'Logged in with capability but not in admin',
 			],
-			'admin_logged_in_no_cap' => [
-				'is_admin'           => true,
-				'is_user_logged_in'  => true,
-				'current_user_can'   => false,
-				'expected'           => false,
-				'description'        => 'In admin and logged in but lacks capability',
+			'admin_logged_in_no_cap'      => [
+				'is_admin'          => true,
+				'is_user_logged_in' => true,
+				'current_user_can'  => false,
+				'expected'          => false,
+				'description'       => 'In admin and logged in but lacks capability',
 			],
-			'all_conditions_met' => [
-				'is_admin'           => true,
-				'is_user_logged_in'  => true,
-				'current_user_can'   => true,
-				'expected'           => true,
-				'description'        => 'All conditions satisfied',
+			'all_conditions_met'          => [
+				'is_admin'          => true,
+				'is_user_logged_in' => true,
+				'current_user_can'  => true,
+				'expected'          => true,
+				'description'       => 'All conditions satisfied',
 			],
 		];
 	}
@@ -557,35 +557,35 @@ class CapabilityCheckerTest extends TestCase {
 	 */
 	public function should_see_notices_scenarios_provider(): array {
 		return [
-			'privileged_user_always_sees' => [
-				'has_capability'   => true,
-				'user_preference'  => 'no',
-				'expected'         => true,
-				'description'      => 'Privileged users always see notices regardless of preference',
+			'privileged_user_always_sees'        => [
+				'has_capability'  => true,
+				'user_preference' => 'no',
+				'expected'        => true,
+				'description'     => 'Privileged users always see notices regardless of preference',
 			],
-			'unprivileged_with_yes_preference' => [
-				'has_capability'   => false,
-				'user_preference'  => 'yes',
-				'expected'         => true,
-				'description'      => 'Unprivileged user with "yes" preference sees notices',
+			'unprivileged_with_yes_preference'   => [
+				'has_capability'  => false,
+				'user_preference' => 'yes',
+				'expected'        => true,
+				'description'     => 'Unprivileged user with "yes" preference sees notices',
 			],
-			'unprivileged_with_no_preference' => [
-				'has_capability'   => false,
-				'user_preference'  => 'no',
-				'expected'         => false,
-				'description'      => 'Unprivileged user with "no" preference does not see notices',
+			'unprivileged_with_no_preference'    => [
+				'has_capability'  => false,
+				'user_preference' => 'no',
+				'expected'        => false,
+				'description'     => 'Unprivileged user with "no" preference does not see notices',
 			],
 			'unprivileged_with_empty_preference' => [
-				'has_capability'   => false,
-				'user_preference'  => '',
-				'expected'         => false,
-				'description'      => 'Unprivileged user with empty preference does not see notices',
+				'has_capability'  => false,
+				'user_preference' => '',
+				'expected'        => false,
+				'description'     => 'Unprivileged user with empty preference does not see notices',
 			],
-			'unprivileged_with_null_preference' => [
-				'has_capability'   => false,
-				'user_preference'  => null,
-				'expected'         => false,
-				'description'      => 'Unprivileged user with null preference does not see notices',
+			'unprivileged_with_null_preference'  => [
+				'has_capability'  => false,
+				'user_preference' => null,
+				'expected'        => false,
+				'description'     => 'Unprivileged user with null preference does not see notices',
 			],
 		];
 	}

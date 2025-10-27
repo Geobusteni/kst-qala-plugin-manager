@@ -25,8 +25,8 @@ use Brain\Monkey;
  * - Pattern matching (exact, wildcard, regex)
  * - Edge cases and error handling
  */
-class NoticeIdentifierTest extends TestCase
-{
+class NoticeIdentifierTest extends TestCase {
+
 	/**
 	 * Instance of NoticeIdentifier to test
 	 *
@@ -39,14 +39,13 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	protected function setUp(): void
-	{
+	protected function setUp(): void {
 		parent::setUp();
 		$this->identifier = new NoticeIdentifier();
 
 		// Mock WordPress salt function
-		Monkey\Functions\when('wp_salt')->justReturn('test_salt_value_12345');
-		$this->mockGetCurrentBlogId(1);
+		Monkey\Functions\when( 'wp_salt' )->justReturn( 'test_salt_value_12345' );
+		$this->mockGetCurrentBlogId( 1 );
 	}
 
 	/**
@@ -54,13 +53,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_returns_valid_md5()
-	{
-		$hash = $this->identifier->generate_hash('my_function', 'admin_notices');
+	public function test_generate_hash_returns_valid_md5() {
+		$hash = $this->identifier->generate_hash( 'my_function', 'admin_notices' );
 
-		$this->assertIsString($hash);
-		$this->assertEquals(32, strlen($hash));
-		$this->assertMatchesRegularExpression('/^[a-f0-9]{32}$/', $hash);
+		$this->assertIsString( $hash );
+		$this->assertEquals( 32, strlen( $hash ) );
+		$this->assertMatchesRegularExpression( '/^[a-f0-9]{32}$/', $hash );
 	}
 
 	/**
@@ -68,12 +66,11 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_for_function_callback()
-	{
-		$hash = $this->identifier->generate_hash('my_notice_function', 'admin_notices');
+	public function test_generate_hash_for_function_callback() {
+		$hash = $this->identifier->generate_hash( 'my_notice_function', 'admin_notices' );
 
-		$this->assertIsString($hash);
-		$this->assertEquals(32, strlen($hash));
+		$this->assertIsString( $hash );
+		$this->assertEquals( 32, strlen( $hash ) );
 	}
 
 	/**
@@ -81,15 +78,14 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_for_class_method_callback()
-	{
+	public function test_generate_hash_for_class_method_callback() {
 		$mock_object = new \stdClass();
-		$callback = [$mock_object, 'show_notice'];
+		$callback    = [ $mock_object, 'show_notice' ];
 
-		$hash = $this->identifier->generate_hash($callback, 'admin_notices');
+		$hash = $this->identifier->generate_hash( $callback, 'admin_notices' );
 
-		$this->assertIsString($hash);
-		$this->assertEquals(32, strlen($hash));
+		$this->assertIsString( $hash );
+		$this->assertEquals( 32, strlen( $hash ) );
 	}
 
 	/**
@@ -97,14 +93,13 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_for_static_method_callback()
-	{
-		$callback = ['MyClass', 'show_notice'];
+	public function test_generate_hash_for_static_method_callback() {
+		$callback = [ 'MyClass', 'show_notice' ];
 
-		$hash = $this->identifier->generate_hash($callback, 'admin_notices');
+		$hash = $this->identifier->generate_hash( $callback, 'admin_notices' );
 
-		$this->assertIsString($hash);
-		$this->assertEquals(32, strlen($hash));
+		$this->assertIsString( $hash );
+		$this->assertEquals( 32, strlen( $hash ) );
 	}
 
 	/**
@@ -112,16 +107,15 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_for_closure_callback()
-	{
-		$callback = function () {
+	public function test_generate_hash_for_closure_callback() {
+		 $callback = function () {
 			return 'test';
-		};
+		 };
 
-		$hash = $this->identifier->generate_hash($callback, 'admin_notices');
+		$hash = $this->identifier->generate_hash( $callback, 'admin_notices' );
 
-		$this->assertIsString($hash);
-		$this->assertEquals(32, strlen($hash));
+		$this->assertIsString( $hash );
+		$this->assertEquals( 32, strlen( $hash ) );
 	}
 
 	/**
@@ -131,17 +125,16 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_uses_site_salt()
-	{
+	public function test_generate_hash_uses_site_salt() {
 		// Generate hash for blog ID 1
-		$this->mockGetCurrentBlogId(1);
-		$hash1 = $this->identifier->generate_hash('my_function', 'admin_notices');
+		$this->mockGetCurrentBlogId( 1 );
+		$hash1 = $this->identifier->generate_hash( 'my_function', 'admin_notices' );
 
 		// Generate hash for blog ID 2
-		$this->mockGetCurrentBlogId(2);
-		$hash2 = $this->identifier->generate_hash('my_function', 'admin_notices');
+		$this->mockGetCurrentBlogId( 2 );
+		$hash2 = $this->identifier->generate_hash( 'my_function', 'admin_notices' );
 
-		$this->assertNotEquals($hash1, $hash2, 'Different blog IDs should produce different hashes');
+		$this->assertNotEquals( $hash1, $hash2, 'Different blog IDs should produce different hashes' );
 	}
 
 	/**
@@ -151,12 +144,11 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_includes_hook_name()
-	{
-		$hash1 = $this->identifier->generate_hash('my_function', 'admin_notices');
-		$hash2 = $this->identifier->generate_hash('my_function', 'network_admin_notices');
+	public function test_generate_hash_includes_hook_name() {
+		$hash1 = $this->identifier->generate_hash( 'my_function', 'admin_notices' );
+		$hash2 = $this->identifier->generate_hash( 'my_function', 'network_admin_notices' );
 
-		$this->assertNotEquals($hash1, $hash2, 'Different hook names should produce different hashes');
+		$this->assertNotEquals( $hash1, $hash2, 'Different hook names should produce different hashes' );
 	}
 
 	/**
@@ -164,12 +156,11 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_generate_hash_is_deterministic()
-	{
-		$hash1 = $this->identifier->generate_hash('my_function', 'admin_notices');
-		$hash2 = $this->identifier->generate_hash('my_function', 'admin_notices');
+	public function test_generate_hash_is_deterministic() {
+		 $hash1 = $this->identifier->generate_hash( 'my_function', 'admin_notices' );
+		$hash2  = $this->identifier->generate_hash( 'my_function', 'admin_notices' );
 
-		$this->assertEquals($hash1, $hash2, 'Same input should always produce same hash');
+		$this->assertEquals( $hash1, $hash2, 'Same input should always produce same hash' );
 	}
 
 	/**
@@ -177,11 +168,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_function()
-	{
-		$name = $this->identifier->get_callback_name('my_notice_function');
+	public function test_get_callback_name_for_function() {
+		 $name = $this->identifier->get_callback_name( 'my_notice_function' );
 
-		$this->assertEquals('my_notice_function', $name);
+		$this->assertEquals( 'my_notice_function', $name );
 	}
 
 	/**
@@ -189,14 +179,13 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_object_method()
-	{
+	public function test_get_callback_name_for_object_method() {
 		$mock_object = new \stdClass();
-		$callback = [$mock_object, 'show_notice'];
+		$callback    = [ $mock_object, 'show_notice' ];
 
-		$name = $this->identifier->get_callback_name($callback);
+		$name = $this->identifier->get_callback_name( $callback );
 
-		$this->assertEquals('stdClass::show_notice', $name);
+		$this->assertEquals( 'stdClass::show_notice', $name );
 	}
 
 	/**
@@ -204,13 +193,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_static_method()
-	{
-		$callback = ['MyClass', 'show_notice'];
+	public function test_get_callback_name_for_static_method() {
+		$callback = [ 'MyClass', 'show_notice' ];
 
-		$name = $this->identifier->get_callback_name($callback);
+		$name = $this->identifier->get_callback_name( $callback );
 
-		$this->assertEquals('MyClass::show_notice', $name);
+		$this->assertEquals( 'MyClass::show_notice', $name );
 	}
 
 	/**
@@ -218,15 +206,14 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_closure()
-	{
+	public function test_get_callback_name_for_closure() {
 		$callback = function () {
 			return 'test';
 		};
 
-		$name = $this->identifier->get_callback_name($callback);
+		$name = $this->identifier->get_callback_name( $callback );
 
-		$this->assertEquals('Closure', $name);
+		$this->assertEquals( 'Closure', $name );
 	}
 
 	/**
@@ -234,17 +221,16 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_invokable_object()
-	{
-		$invokable = new class {
+	public function test_get_callback_name_for_invokable_object() {
+		 $invokable = new class() {
 			public function __invoke() {
 				return 'test';
 			}
-		};
+		 };
 
-		$name = $this->identifier->get_callback_name($invokable);
+		$name = $this->identifier->get_callback_name( $invokable );
 
-		$this->assertStringContainsString('class@anonymous', $name);
+		$this->assertStringContainsString( 'class@anonymous', $name );
 	}
 
 	/**
@@ -252,11 +238,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_invalid_callback()
-	{
-		$name = $this->identifier->get_callback_name(12345);
+	public function test_get_callback_name_for_invalid_callback() {
+		 $name = $this->identifier->get_callback_name( 12345 );
 
-		$this->assertEquals('Unknown', $name);
+		$this->assertEquals( 'Unknown', $name );
 	}
 
 	/**
@@ -264,11 +249,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_null()
-	{
-		$name = $this->identifier->get_callback_name(null);
+	public function test_get_callback_name_for_null() {
+		 $name = $this->identifier->get_callback_name( null );
 
-		$this->assertEquals('Unknown', $name);
+		$this->assertEquals( 'Unknown', $name );
 	}
 
 	/**
@@ -276,13 +260,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_is_closure_detects_closures()
-	{
+	public function test_is_closure_detects_closures() {
 		$closure = function () {
 			return 'test';
 		};
 
-		$this->assertTrue($this->identifier->is_closure($closure));
+		$this->assertTrue( $this->identifier->is_closure( $closure ) );
 	}
 
 	/**
@@ -290,9 +273,8 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_is_closure_returns_false_for_functions()
-	{
-		$this->assertFalse($this->identifier->is_closure('my_function'));
+	public function test_is_closure_returns_false_for_functions() {
+		 $this->assertFalse( $this->identifier->is_closure( 'my_function' ) );
 	}
 
 	/**
@@ -300,11 +282,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_is_closure_returns_false_for_class_methods()
-	{
-		$callback = ['MyClass', 'show_notice'];
+	public function test_is_closure_returns_false_for_class_methods() {
+		 $callback = [ 'MyClass', 'show_notice' ];
 
-		$this->assertFalse($this->identifier->is_closure($callback));
+		$this->assertFalse( $this->identifier->is_closure( $callback ) );
 	}
 
 	/**
@@ -312,9 +293,8 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_is_closure_returns_false_for_null()
-	{
-		$this->assertFalse($this->identifier->is_closure(null));
+	public function test_is_closure_returns_false_for_null() {
+		$this->assertFalse( $this->identifier->is_closure( null ) );
 	}
 
 	/**
@@ -322,18 +302,19 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_sanitize_pattern_removes_dangerous_characters()
-	{
+	public function test_sanitize_pattern_removes_dangerous_characters() {
 		// Mock sanitize_text_field to actually sanitize
-		Monkey\Functions\when('sanitize_text_field')->alias(function ($text) {
-			return trim(strip_tags($text));
-		});
+		Monkey\Functions\when( 'sanitize_text_field' )->alias(
+			function ( $text ) {
+				return trim( strip_tags( $text ) );
+			}
+		);
 
-		$pattern = '<script>alert("xss")</script>rocket_*';
-		$sanitized = $this->identifier->sanitize_pattern($pattern);
+		$pattern   = '<script>alert("xss")</script>rocket_*';
+		$sanitized = $this->identifier->sanitize_pattern( $pattern );
 
-		$this->assertStringNotContainsString('<script>', $sanitized);
-		$this->assertStringNotContainsString('</script>', $sanitized);
+		$this->assertStringNotContainsString( '<script>', $sanitized );
+		$this->assertStringNotContainsString( '</script>', $sanitized );
 	}
 
 	/**
@@ -341,12 +322,11 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_sanitize_pattern_preserves_valid_characters()
-	{
-		$pattern = 'rocket_*';
-		$sanitized = $this->identifier->sanitize_pattern($pattern);
+	public function test_sanitize_pattern_preserves_valid_characters() {
+		$pattern   = 'rocket_*';
+		$sanitized = $this->identifier->sanitize_pattern( $pattern );
 
-		$this->assertEquals('rocket_*', $sanitized);
+		$this->assertEquals( 'rocket_*', $sanitized );
 	}
 
 	/**
@@ -354,13 +334,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_sanitize_pattern_preserves_regex()
-	{
-		$pattern = '/^rocket_.*$/';
-		$sanitized = $this->identifier->sanitize_pattern($pattern);
+	public function test_sanitize_pattern_preserves_regex() {
+		$pattern   = '/^rocket_.*$/';
+		$sanitized = $this->identifier->sanitize_pattern( $pattern );
 
 		// Should preserve the pattern structure
-		$this->assertStringContainsString('rocket', $sanitized);
+		$this->assertStringContainsString( 'rocket', $sanitized );
 	}
 
 	/**
@@ -368,11 +347,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_sanitize_pattern_handles_empty_string()
-	{
-		$sanitized = $this->identifier->sanitize_pattern('');
+	public function test_sanitize_pattern_handles_empty_string() {
+		$sanitized = $this->identifier->sanitize_pattern( '' );
 
-		$this->assertEquals('', $sanitized);
+		$this->assertEquals( '', $sanitized );
 	}
 
 	/**
@@ -380,16 +358,17 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_sanitize_pattern_trims_whitespace()
-	{
-		Monkey\Functions\when('sanitize_text_field')->alias(function ($text) {
-			return trim(strip_tags($text));
-		});
+	public function test_sanitize_pattern_trims_whitespace() {
+		Monkey\Functions\when( 'sanitize_text_field' )->alias(
+			function ( $text ) {
+				return trim( strip_tags( $text ) );
+			}
+		);
 
-		$pattern = '  rocket_*  ';
-		$sanitized = $this->identifier->sanitize_pattern($pattern);
+		$pattern   = '  rocket_*  ';
+		$sanitized = $this->identifier->sanitize_pattern( $pattern );
 
-		$this->assertEquals('rocket_*', $sanitized);
+		$this->assertEquals( 'rocket_*', $sanitized );
 	}
 
 	/**
@@ -397,13 +376,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return array
 	 */
-	public function provide_exact_match_scenarios()
-	{
+	public function provide_exact_match_scenarios() {
 		return [
-			'function name matches' => ['my_function', 'my_function', true],
-			'function name does not match' => ['my_function', 'other_function', false],
-			'class method matches' => [['MyClass', 'show'], 'MyClass::show', true],
-			'class method does not match' => [['MyClass', 'show'], 'MyClass::hide', false],
+			'function name matches'        => [ 'my_function', 'my_function', true ],
+			'function name does not match' => [ 'my_function', 'other_function', false ],
+			'class method matches'         => [ [ 'MyClass', 'show' ], 'MyClass::show', true ],
+			'class method does not match'  => [ [ 'MyClass', 'show' ], 'MyClass::hide', false ],
 		];
 	}
 
@@ -418,11 +396,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_exact_match($callback, $pattern, $expected)
-	{
-		$result = $this->identifier->matches_pattern($callback, $pattern);
+	public function test_matches_pattern_exact_match( $callback, $pattern, $expected ) {
+		$result = $this->identifier->matches_pattern( $callback, $pattern );
 
-		$this->assertEquals($expected, $result);
+		$this->assertEquals( $expected, $result );
 	}
 
 	/**
@@ -430,17 +407,16 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return array
 	 */
-	public function provide_wildcard_match_scenarios()
-	{
+	public function provide_wildcard_match_scenarios() {
 		return [
-			'prefix wildcard matches' => ['rocket_notice', 'rocket_*', true],
-			'prefix wildcard does not match' => ['my_rocket_notice', 'rocket_*', false],
-			'suffix wildcard matches' => ['show_notice', '*_notice', true],
-			'suffix wildcard does not match' => ['notice_show', '*_notice', false],
-			'middle wildcard matches' => ['rocket_bad_notice', 'rocket_*_notice', true],
-			'middle wildcard does not match' => ['rocket_notice', 'rocket_*_warning', false],
-			'class wildcard matches' => [['YoastSEO', 'show'], 'Yoast*::*', true],
-			'multiple wildcards match' => ['any_prefix_any_suffix', '*_prefix_*', true],
+			'prefix wildcard matches'        => [ 'rocket_notice', 'rocket_*', true ],
+			'prefix wildcard does not match' => [ 'my_rocket_notice', 'rocket_*', false ],
+			'suffix wildcard matches'        => [ 'show_notice', '*_notice', true ],
+			'suffix wildcard does not match' => [ 'notice_show', '*_notice', false ],
+			'middle wildcard matches'        => [ 'rocket_bad_notice', 'rocket_*_notice', true ],
+			'middle wildcard does not match' => [ 'rocket_notice', 'rocket_*_warning', false ],
+			'class wildcard matches'         => [ [ 'YoastSEO', 'show' ], 'Yoast*::*', true ],
+			'multiple wildcards match'       => [ 'any_prefix_any_suffix', '*_prefix_*', true ],
 		];
 	}
 
@@ -455,11 +431,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_wildcard_match($callback, $pattern, $expected)
-	{
-		$result = $this->identifier->matches_pattern($callback, $pattern);
+	public function test_matches_pattern_wildcard_match( $callback, $pattern, $expected ) {
+		$result = $this->identifier->matches_pattern( $callback, $pattern );
 
-		$this->assertEquals($expected, $result);
+		$this->assertEquals( $expected, $result );
 	}
 
 	/**
@@ -467,15 +442,14 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return array
 	 */
-	public function provide_regex_match_scenarios()
-	{
+	public function provide_regex_match_scenarios() {
 		return [
-			'regex matches start' => ['rocket_notice', '/^rocket_.*$/', true],
-			'regex does not match start' => ['my_rocket_notice', '/^rocket_.*$/', false],
-			'regex matches end' => ['show_notice', '/.*_notice$/', true],
-			'regex case sensitive' => ['Rocket_Notice', '/^rocket_.*$/', false],
-			'regex character class' => ['rocket_123', '/^rocket_[0-9]+$/', true],
-			'regex optional group' => ['rocket_notice_test', '/^rocket_(notice|warning)_test$/', true],
+			'regex matches start'        => [ 'rocket_notice', '/^rocket_.*$/', true ],
+			'regex does not match start' => [ 'my_rocket_notice', '/^rocket_.*$/', false ],
+			'regex matches end'          => [ 'show_notice', '/.*_notice$/', true ],
+			'regex case sensitive'       => [ 'Rocket_Notice', '/^rocket_.*$/', false ],
+			'regex character class'      => [ 'rocket_123', '/^rocket_[0-9]+$/', true ],
+			'regex optional group'       => [ 'rocket_notice_test', '/^rocket_(notice|warning)_test$/', true ],
 		];
 	}
 
@@ -490,11 +464,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_regex_match($callback, $pattern, $expected)
-	{
-		$result = $this->identifier->matches_pattern($callback, $pattern);
+	public function test_matches_pattern_regex_match( $callback, $pattern, $expected ) {
+		$result = $this->identifier->matches_pattern( $callback, $pattern );
 
-		$this->assertEquals($expected, $result);
+		$this->assertEquals( $expected, $result );
 	}
 
 	/**
@@ -502,12 +475,11 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_handles_invalid_regex()
-	{
-		$result = $this->identifier->matches_pattern('my_function', '/[invalid(regex/');
+	public function test_matches_pattern_handles_invalid_regex() {
+		$result = $this->identifier->matches_pattern( 'my_function', '/[invalid(regex/' );
 
 		// Should not throw error, should return false
-		$this->assertFalse($result);
+		$this->assertFalse( $result );
 	}
 
 	/**
@@ -515,15 +487,14 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_for_closures()
-	{
+	public function test_matches_pattern_for_closures() {
 		$closure = function () {
 			return 'test';
 		};
 
 		// Closures should match 'Closure' pattern
-		$this->assertTrue($this->identifier->matches_pattern($closure, 'Closure'));
-		$this->assertFalse($this->identifier->matches_pattern($closure, 'my_function'));
+		$this->assertTrue( $this->identifier->matches_pattern( $closure, 'Closure' ) );
+		$this->assertFalse( $this->identifier->matches_pattern( $closure, 'my_function' ) );
 	}
 
 	/**
@@ -531,11 +502,10 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_handles_empty_pattern()
-	{
-		$result = $this->identifier->matches_pattern('my_function', '');
+	public function test_matches_pattern_handles_empty_pattern() {
+		$result = $this->identifier->matches_pattern( 'my_function', '' );
 
-		$this->assertFalse($result);
+		$this->assertFalse( $result );
 	}
 
 	/**
@@ -545,8 +515,7 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_all_closures_generate_same_hash()
-	{
+	public function test_all_closures_generate_same_hash() {
 		$closure1 = function () {
 			return 'test1';
 		};
@@ -554,10 +523,10 @@ class NoticeIdentifierTest extends TestCase
 			return 'test2';
 		};
 
-		$hash1 = $this->identifier->generate_hash($closure1, 'admin_notices');
-		$hash2 = $this->identifier->generate_hash($closure2, 'admin_notices');
+		$hash1 = $this->identifier->generate_hash( $closure1, 'admin_notices' );
+		$hash2 = $this->identifier->generate_hash( $closure2, 'admin_notices' );
 
-		$this->assertEquals($hash1, $hash2, 'All closures should generate the same hash');
+		$this->assertEquals( $hash1, $hash2, 'All closures should generate the same hash' );
 	}
 
 	/**
@@ -565,12 +534,11 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_different_functions_generate_different_hashes()
-	{
-		$hash1 = $this->identifier->generate_hash('function_one', 'admin_notices');
-		$hash2 = $this->identifier->generate_hash('function_two', 'admin_notices');
+	public function test_different_functions_generate_different_hashes() {
+		$hash1 = $this->identifier->generate_hash( 'function_one', 'admin_notices' );
+		$hash2 = $this->identifier->generate_hash( 'function_two', 'admin_notices' );
 
-		$this->assertNotEquals($hash1, $hash2);
+		$this->assertNotEquals( $hash1, $hash2 );
 	}
 
 	/**
@@ -578,15 +546,14 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_different_class_methods_generate_different_hashes()
-	{
-		$callback1 = ['MyClass', 'method_one'];
-		$callback2 = ['MyClass', 'method_two'];
+	public function test_different_class_methods_generate_different_hashes() {
+		$callback1 = [ 'MyClass', 'method_one' ];
+		$callback2 = [ 'MyClass', 'method_two' ];
 
-		$hash1 = $this->identifier->generate_hash($callback1, 'admin_notices');
-		$hash2 = $this->identifier->generate_hash($callback2, 'admin_notices');
+		$hash1 = $this->identifier->generate_hash( $callback1, 'admin_notices' );
+		$hash2 = $this->identifier->generate_hash( $callback2, 'admin_notices' );
 
-		$this->assertNotEquals($hash1, $hash2);
+		$this->assertNotEquals( $hash1, $hash2 );
 	}
 
 	/**
@@ -594,13 +561,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_get_callback_name_for_namespaced_class()
-	{
-		$callback = ['My\\Namespace\\MyClass', 'show_notice'];
+	public function test_get_callback_name_for_namespaced_class() {
+		 $callback = [ 'My\\Namespace\\MyClass', 'show_notice' ];
 
-		$name = $this->identifier->get_callback_name($callback);
+		$name = $this->identifier->get_callback_name( $callback );
 
-		$this->assertEquals('My\\Namespace\\MyClass::show_notice', $name);
+		$this->assertEquals( 'My\\Namespace\\MyClass::show_notice', $name );
 	}
 
 	/**
@@ -608,13 +574,12 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_matches_pattern_with_namespaced_classes()
-	{
-		$callback = ['WooCommerce\\Admin\\Notice', 'show'];
+	public function test_matches_pattern_with_namespaced_classes() {
+		$callback = [ 'WooCommerce\\Admin\\Notice', 'show' ];
 
-		$this->assertTrue($this->identifier->matches_pattern($callback, 'WooCommerce\\Admin\\Notice::show'));
-		$this->assertTrue($this->identifier->matches_pattern($callback, 'WooCommerce*::*'));
-		$this->assertFalse($this->identifier->matches_pattern($callback, 'Yoast*::*'));
+		$this->assertTrue( $this->identifier->matches_pattern( $callback, 'WooCommerce\\Admin\\Notice::show' ) );
+		$this->assertTrue( $this->identifier->matches_pattern( $callback, 'WooCommerce*::*' ) );
+		$this->assertFalse( $this->identifier->matches_pattern( $callback, 'Yoast*::*' ) );
 	}
 
 	/**
@@ -622,19 +587,18 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_hash_generation_performance()
-	{
-		$start = microtime(true);
+	public function test_hash_generation_performance() {
+		$start = microtime( true );
 
 		// Generate 1000 hashes
-		for ($i = 0; $i < 1000; $i++) {
-			$this->identifier->generate_hash("function_$i", 'admin_notices');
+		for ( $i = 0; $i < 1000; $i++ ) {
+			$this->identifier->generate_hash( "function_$i", 'admin_notices' );
 		}
 
-		$elapsed = microtime(true) - $start;
+		$elapsed = microtime( true ) - $start;
 
 		// Should complete in less than 100ms (very generous threshold)
-		$this->assertLessThan(0.1, $elapsed, 'Hash generation should be fast');
+		$this->assertLessThan( 0.1, $elapsed, 'Hash generation should be fast' );
 	}
 
 	/**
@@ -642,21 +606,20 @@ class NoticeIdentifierTest extends TestCase
 	 *
 	 * @return void
 	 */
-	public function test_real_world_plugin_patterns()
-	{
-		// WooCommerce patterns
-		$wc_callback = ['WC_Admin_Notices', 'add_notice'];
-		$this->assertTrue($this->identifier->matches_pattern($wc_callback, 'WC_*'));
-		$this->assertTrue($this->identifier->matches_pattern($wc_callback, '/^WC_.*$/'));
+	public function test_real_world_plugin_patterns() {
+		 // WooCommerce patterns
+		$wc_callback = [ 'WC_Admin_Notices', 'add_notice' ];
+		$this->assertTrue( $this->identifier->matches_pattern( $wc_callback, 'WC_*' ) );
+		$this->assertTrue( $this->identifier->matches_pattern( $wc_callback, '/^WC_.*$/' ) );
 
 		// Yoast SEO patterns
-		$yoast_callback = ['WPSEO_Admin_Notifications', 'show'];
-		$this->assertTrue($this->identifier->matches_pattern($yoast_callback, 'WPSEO_*'));
-		$this->assertTrue($this->identifier->matches_pattern($yoast_callback, '/^WPSEO_.*$/'));
+		$yoast_callback = [ 'WPSEO_Admin_Notifications', 'show' ];
+		$this->assertTrue( $this->identifier->matches_pattern( $yoast_callback, 'WPSEO_*' ) );
+		$this->assertTrue( $this->identifier->matches_pattern( $yoast_callback, '/^WPSEO_.*$/' ) );
 
 		// WP Rocket patterns
 		$rocket_callback = 'rocket_bad_deactivations';
-		$this->assertTrue($this->identifier->matches_pattern($rocket_callback, 'rocket_*'));
-		$this->assertTrue($this->identifier->matches_pattern($rocket_callback, '/^rocket_.*$/'));
+		$this->assertTrue( $this->identifier->matches_pattern( $rocket_callback, 'rocket_*' ) );
+		$this->assertTrue( $this->identifier->matches_pattern( $rocket_callback, '/^rocket_.*$/' ) );
 	}
 }

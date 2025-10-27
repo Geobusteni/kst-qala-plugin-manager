@@ -36,13 +36,13 @@ class SiteHealthHider implements WithHooksInterface {
 	 * @return void
 	 */
 	public function init(): void {
-		// Remove Site Health menu page (priority 999 to run after menu registration)
+		// Remove Site Health menu page (priority 999 to run after menu registration).
 		add_action( 'admin_menu', [ $this, 'remove_menu_page' ], 999 );
 
-		// Remove Site Health dashboard widget
+		// Remove Site Health dashboard widget.
 		add_action( 'wp_dashboard_setup', [ $this, 'remove_dashboard_widget' ] );
 
-		// Redirect unauthorized access attempts
+		// Redirect unauthorized access attempts.
 		add_action( 'admin_init', [ $this, 'redirect_site_health' ] );
 	}
 
@@ -57,19 +57,19 @@ class SiteHealthHider implements WithHooksInterface {
 	 * @return void
 	 */
 	public function remove_menu_page(): void {
-		// Skip if not in admin context
+		// Skip if not in admin context.
 		if ( ! is_admin() ) {
 			return;
 		}
 
-		// Skip if user has qala_full_access capability
+		// Skip if user has qala_full_access capability.
 		if ( $this->user_has_capability( 'qala_full_access' ) ) {
 			return;
 		}
 
-		// Remove Site Health submenu from Tools menu
-		// Site Health is a submenu item under Tools, not a top-level menu
-		remove_submenu_page( 'tools.php', 'site-health.php' );
+		// Remove Site Health submenu from Tools menu.
+		// Site Health is a submenu item under Tools, not a top-level menu.
+		\remove_submenu_page( 'tools.php', 'site-health.php' );
 	}
 
 	/**
@@ -83,20 +83,20 @@ class SiteHealthHider implements WithHooksInterface {
 	 * @return void
 	 */
 	public function remove_dashboard_widget(): void {
-		// Skip if not in admin context
+		// Skip if not in admin context.
 		if ( ! is_admin() ) {
 			return;
 		}
 
-		// Skip if user has qala_full_access capability
+		// Skip if user has qala_full_access capability.
 		if ( $this->user_has_capability( 'qala_full_access' ) ) {
 			return;
 		}
 
-		// Remove Site Health dashboard widget
-		// Widget ID: dashboard_site_health
-		// Screen: dashboard
-		// Context: normal (main column)
+		// Remove Site Health dashboard widget.
+		// Widget ID: dashboard_site_health.
+		// Screen: dashboard.
+		// Context: normal (main column).
 		remove_meta_box( 'dashboard_site_health', 'dashboard', 'normal' );
 	}
 
@@ -114,29 +114,29 @@ class SiteHealthHider implements WithHooksInterface {
 	 * @return void
 	 */
 	public function redirect_site_health(): void {
-		// Skip if not in admin context
+		// Skip if not in admin context.
 		if ( ! is_admin() ) {
 			return;
 		}
 
-		// Skip if user has qala_full_access capability
+		// Skip if user has qala_full_access capability.
 		if ( $this->user_has_capability( 'qala_full_access' ) ) {
 			return;
 		}
 
-		// Skip AJAX requests (Site Health API endpoints)
-		if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
+		// Skip AJAX requests (Site Health API endpoints).
+		if ( function_exists( '\wp_doing_ajax' ) && \wp_doing_ajax() ) {
 			return;
 		}
 
-		// Check if we're on a Site Health page
+		// Check if we're on a Site Health page.
 		if ( ! $this->is_site_health_page() ) {
 			return;
 		}
 
-		// Redirect to dashboard
+		// Redirect to dashboard.
 		$redirect_url = admin_url( '' );
-		wp_redirect( $redirect_url );
+		\wp_safe_redirect( $redirect_url );
 		exit;
 	}
 
@@ -156,10 +156,10 @@ class SiteHealthHider implements WithHooksInterface {
 			return false;
 		}
 
-		// Check if we're on Site Health pages
+		// Check if we're on Site Health pages.
 		$site_health_pages = [
-			'site-health.php',   // Modern Site Health page (WP 5.2+)
-			'health-check.php',  // Legacy Site Health page (older WP)
+			'site-health.php',   // Modern Site Health page (WP 5.2+).
+			'health-check.php',  // Legacy Site Health page (older WP).
 		];
 
 		return in_array( $pagenow, $site_health_pages, true );

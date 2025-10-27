@@ -69,23 +69,29 @@ class SiteHealthHiderTest extends TestCase {
 		// Expect admin_menu hook to be added
 		Actions\expectAdded( 'admin_menu' )
 			->once()
-			->whenHappen( function ( $callback, $priority ) {
-				$this->assertEquals( 999, $priority, 'admin_menu priority should be 999' );
-			} );
+			->whenHappen(
+				function ( $callback, $priority ) {
+					$this->assertEquals( 999, $priority, 'admin_menu priority should be 999' );
+				}
+			);
 
 		// Expect wp_dashboard_setup hook to be added
 		Actions\expectAdded( 'wp_dashboard_setup' )
 			->once()
-			->whenHappen( function ( $callback, $priority ) {
-				$this->assertEquals( 10, $priority, 'wp_dashboard_setup priority should be 10' );
-			} );
+			->whenHappen(
+				function ( $callback, $priority ) {
+					$this->assertEquals( 10, $priority, 'wp_dashboard_setup priority should be 10' );
+				}
+			);
 
 		// Expect admin_init hook to be added
 		Actions\expectAdded( 'admin_init' )
 			->once()
-			->whenHappen( function ( $callback, $priority ) {
-				$this->assertEquals( 10, $priority, 'admin_init priority should be 10' );
-			} );
+			->whenHappen(
+				function ( $callback, $priority ) {
+					$this->assertEquals( 10, $priority, 'admin_init priority should be 10' );
+				}
+			);
 
 		$this->hider->init();
 	}

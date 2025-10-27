@@ -165,12 +165,16 @@ class AdminBarToggleTest extends TestCase {
 		// Should add menu node
 		$wp_admin_bar->shouldReceive( 'add_node' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return $args['id'] === 'qala-notice-toggle'
-					&& isset( $args['title'] )
-					&& isset( $args['href'] )
-					&& isset( $args['meta'] );
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['id'] === 'qala-notice-toggle'
+						&& isset( $args['title'] )
+						&& isset( $args['href'] )
+						&& isset( $args['meta'] );
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->add_admin_bar_menu( $wp_admin_bar );
 	}
@@ -192,11 +196,15 @@ class AdminBarToggleTest extends TestCase {
 
 		$wp_admin_bar->shouldReceive( 'add_node' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				// Title should indicate notices are OFF
-				return strpos( $args['title'], 'Off' ) !== false
-					|| strpos( $args['title'], 'OFF' ) !== false;
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						// Title should indicate notices are OFF
+						return strpos( $args['title'], 'Off' ) !== false
+						|| strpos( $args['title'], 'OFF' ) !== false;
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->add_admin_bar_menu( $wp_admin_bar );
 	}
@@ -218,11 +226,15 @@ class AdminBarToggleTest extends TestCase {
 
 		$wp_admin_bar->shouldReceive( 'add_node' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				// Title should indicate notices are ON
-				return strpos( $args['title'], 'On' ) !== false
-					|| strpos( $args['title'], 'ON' ) !== false;
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						// Title should indicate notices are ON
+						return strpos( $args['title'], 'On' ) !== false
+						|| strpos( $args['title'], 'ON' ) !== false;
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->add_admin_bar_menu( $wp_admin_bar );
 	}
@@ -240,9 +252,13 @@ class AdminBarToggleTest extends TestCase {
 
 		$wp_admin_bar->shouldReceive( 'add_node' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return $args['id'] === 'qala-notice-toggle';
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['id'] === 'qala-notice-toggle';
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->add_admin_bar_menu( $wp_admin_bar );
 	}
@@ -260,9 +276,13 @@ class AdminBarToggleTest extends TestCase {
 
 		$wp_admin_bar->shouldReceive( 'add_node' )
 			->once()
-			->with( Mockery::on( function ( $args ) {
-				return $args['href'] === '#';
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $args ) {
+						return $args['href'] === '#';
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->add_admin_bar_menu( $wp_admin_bar );
 	}
@@ -282,9 +302,13 @@ class AdminBarToggleTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_error' )
 			->once()
-			->with( Mockery::on( function ( $data ) {
-				return isset( $data['message'] );
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $data ) {
+						return isset( $data['message'] );
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->handle_toggle_ajax();
 	}
@@ -304,9 +328,13 @@ class AdminBarToggleTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_error' )
 			->once()
-			->with( Mockery::on( function ( $data ) {
-				return $data['message'] === 'Permission denied';
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $data ) {
+						return $data['message'] === 'Permission denied';
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->handle_toggle_ajax();
 	}
@@ -335,11 +363,15 @@ class AdminBarToggleTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_success' )
 			->once()
-			->with( Mockery::on( function ( $data ) {
-				return $data['showing'] === true
-					&& isset( $data['message'] )
-					&& isset( $data['new_title'] );
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $data ) {
+						return $data['showing'] === true
+						&& isset( $data['message'] )
+						&& isset( $data['new_title'] );
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->handle_toggle_ajax();
 	}
@@ -368,11 +400,15 @@ class AdminBarToggleTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_success' )
 			->once()
-			->with( Mockery::on( function ( $data ) {
-				return $data['showing'] === false
-					&& isset( $data['message'] )
-					&& isset( $data['new_title'] );
-			} ) );
+			->with(
+				Mockery::on(
+					function ( $data ) {
+						return $data['showing'] === false
+						&& isset( $data['message'] )
+						&& isset( $data['new_title'] );
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->handle_toggle_ajax();
 	}
@@ -613,12 +649,14 @@ class AdminBarToggleTest extends TestCase {
 			->with(
 				'qala-admin-bar-toggle',
 				'qalaAdminBarToggle',
-				Mockery::on( function ( $data ) {
-					return isset( $data['ajaxUrl'] )
+				Mockery::on(
+					function ( $data ) {
+						return isset( $data['ajaxUrl'] )
 						&& isset( $data['nonce'] )
 						&& isset( $data['action'] )
 						&& $data['action'] === 'qala_toggle_notice_visibility';
-				} )
+					}
+				)
 			);
 
 		$this->admin_bar_toggle->enqueue_assets();
@@ -644,12 +682,16 @@ class AdminBarToggleTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_success' )
 			->once()
-			->with( Mockery::on( function ( $data ) {
-				// New title should show "On"
-				return isset( $data['new_title'] )
-					&& ( strpos( $data['new_title'], 'On' ) !== false
+			->with(
+				Mockery::on(
+					function ( $data ) {
+						// New title should show "On"
+						return isset( $data['new_title'] )
+						&& ( strpos( $data['new_title'], 'On' ) !== false
 						|| strpos( $data['new_title'], 'ON' ) !== false );
-			} ) );
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->handle_toggle_ajax();
 	}
@@ -674,12 +716,16 @@ class AdminBarToggleTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_success' )
 			->once()
-			->with( Mockery::on( function ( $data ) {
-				// New title should show "Off"
-				return isset( $data['new_title'] )
-					&& ( strpos( $data['new_title'], 'Off' ) !== false
+			->with(
+				Mockery::on(
+					function ( $data ) {
+						// New title should show "Off"
+						return isset( $data['new_title'] )
+						&& ( strpos( $data['new_title'], 'Off' ) !== false
 						|| strpos( $data['new_title'], 'OFF' ) !== false );
-			} ) );
+					}
+				)
+			);
 
 		$this->admin_bar_toggle->handle_toggle_ajax();
 	}

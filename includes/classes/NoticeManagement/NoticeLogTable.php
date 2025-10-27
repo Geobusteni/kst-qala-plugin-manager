@@ -57,14 +57,16 @@ class NoticeLogTable extends \WP_List_Table {
 	 * @param AllowlistManager $allowlist Allowlist manager instance.
 	 */
 	public function __construct( NoticeLogger $logger, AllowlistManager $allowlist ) {
-		$this->logger = $logger;
+		$this->logger    = $logger;
 		$this->allowlist = $allowlist;
 
-		parent::__construct( [
-			'singular' => 'notice',
-			'plural' => 'notices',
-			'ajax' => false,
-		] );
+		parent::__construct(
+			[
+				'singular' => 'notice',
+				'plural'   => 'notices',
+				'ajax'     => false,
+			]
+		);
 	}
 
 	/**
@@ -74,12 +76,12 @@ class NoticeLogTable extends \WP_List_Table {
 	 */
 	public function get_columns(): array {
 		return [
-			'cb' => '<input type="checkbox" />',
+			'cb'            => '<input type="checkbox" />',
 			'callback_name' => __( 'Callback Name', 'qala-plugin-manager' ),
-			'hook_name' => __( 'Hook', 'qala-plugin-manager' ),
+			'hook_name'     => __( 'Hook', 'qala-plugin-manager' ),
 			'hook_priority' => __( 'Priority', 'qala-plugin-manager' ),
-			'action_taken' => __( 'Action', 'qala-plugin-manager' ),
-			'created_at' => __( 'Last Seen', 'qala-plugin-manager' ),
+			'action_taken'  => __( 'Action', 'qala-plugin-manager' ),
+			'created_at'    => __( 'Last Seen', 'qala-plugin-manager' ),
 		];
 	}
 
@@ -91,9 +93,9 @@ class NoticeLogTable extends \WP_List_Table {
 	public function get_sortable_columns(): array {
 		return [
 			'callback_name' => [ 'callback_name', false ],
-			'hook_name' => [ 'hook_name', false ],
+			'hook_name'     => [ 'hook_name', false ],
 			'hook_priority' => [ 'hook_priority', false ],
-			'created_at' => [ 'created_at', true ], // Default sort
+			'created_at'    => [ 'created_at', true ], // Default sort
 		];
 	}
 
@@ -104,7 +106,7 @@ class NoticeLogTable extends \WP_List_Table {
 	 */
 	public function get_bulk_actions(): array {
 		return [
-			'delete' => __( 'Delete', 'qala-plugin-manager' ),
+			'delete'           => __( 'Delete', 'qala-plugin-manager' ),
 			'add_to_allowlist' => __( 'Add to Allowlist', 'qala-plugin-manager' ),
 		];
 	}
@@ -172,10 +174,10 @@ class NoticeLogTable extends \WP_List_Table {
 	 */
 	public function column_action_taken( $item ): string {
 		$action = $item['action_taken'];
-		$class = 'qala-action-' . sanitize_html_class( $action );
+		$class  = 'qala-action-' . sanitize_html_class( $action );
 
 		$labels = [
-			'removed' => __( 'Removed', 'qala-plugin-manager' ),
+			'removed'          => __( 'Removed', 'qala-plugin-manager' ),
 			'kept_allowlisted' => __( 'Kept (Allowlisted)', 'qala-plugin-manager' ),
 		];
 
@@ -225,39 +227,41 @@ class NoticeLogTable extends \WP_List_Table {
 	 */
 	public function prepare_items(): void {
 		// Register columns
-		$columns = $this->get_columns();
-		$hidden = [];
-		$sortable = $this->get_sortable_columns();
+		$columns               = $this->get_columns();
+		$hidden                = [];
+		$sortable              = $this->get_sortable_columns();
 		$this->_column_headers = [ $columns, $hidden, $sortable ];
 
 		// Handle bulk actions
 		$this->process_bulk_action();
 
 		// Get data
-		$per_page = 20;
+		$per_page     = 20;
 		$current_page = $this->get_pagenum();
-		$offset = ( $current_page - 1 ) * $per_page;
+		$offset       = ( $current_page - 1 ) * $per_page;
 
 		// Get orderby and order parameters
 		$orderby = isset( $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : 'created_at';
-		$order = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'DESC';
+		$order   = isset( $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : 'DESC';
 
 		// Get search term
 		$search = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 
 		// Fetch data
-		$data = $this->fetch_data( $per_page, $offset, $orderby, $order, $search );
+		$data        = $this->fetch_data( $per_page, $offset, $orderby, $order, $search );
 		$total_items = $this->get_total_items( $search );
 
 		// Set items
 		$this->items = $data;
 
 		// Set pagination
-		$this->set_pagination_args( [
-			'total_items' => $total_items,
-			'per_page' => $per_page,
-			'total_pages' => ceil( $total_items / $per_page ),
-		] );
+		$this->set_pagination_args(
+			[
+				'total_items' => $total_items,
+				'per_page'    => $per_page,
+				'total_pages' => ceil( $total_items / $per_page ),
+			]
+		);
 	}
 
 	/**
@@ -285,7 +289,7 @@ class NoticeLogTable extends \WP_List_Table {
 
 		// Build query
 		$where = '1=1';
-		$args = [];
+		$args  = [];
 
 		if ( ! empty( $search ) ) {
 			$where .= ' AND callback_name LIKE %s';
@@ -317,7 +321,7 @@ class NoticeLogTable extends \WP_List_Table {
 		$table = $wpdb->prefix . 'qala_hidden_notices_log';
 
 		$where = '1=1';
-		$args = [];
+		$args  = [];
 
 		if ( ! empty( $search ) ) {
 			$where .= ' AND callback_name LIKE %s';
@@ -381,8 +385,8 @@ class NoticeLogTable extends \WP_List_Table {
 		$table = $wpdb->prefix . 'qala_hidden_notices_log';
 
 		$placeholders = implode( ',', array_fill( 0, count( $notice_ids ), '%d' ) );
-		$query = "DELETE FROM {$table} WHERE id IN ({$placeholders})";
-		$query = $wpdb->prepare( $query, ...$notice_ids );
+		$query        = "DELETE FROM {$table} WHERE id IN ({$placeholders})";
+		$query        = $wpdb->prepare( $query, ...$notice_ids );
 
 		$wpdb->query( $query );
 
@@ -409,8 +413,8 @@ class NoticeLogTable extends \WP_List_Table {
 		$table = $wpdb->prefix . 'qala_hidden_notices_log';
 
 		$placeholders = implode( ',', array_fill( 0, count( $notice_ids ), '%d' ) );
-		$query = "SELECT DISTINCT callback_name FROM {$table} WHERE id IN ({$placeholders})";
-		$query = $wpdb->prepare( $query, ...$notice_ids );
+		$query        = "SELECT DISTINCT callback_name FROM {$table} WHERE id IN ({$placeholders})";
+		$query        = $wpdb->prepare( $query, ...$notice_ids );
 
 		$callbacks = $wpdb->get_col( $query );
 

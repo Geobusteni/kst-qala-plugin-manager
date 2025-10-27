@@ -64,7 +64,7 @@ class AdminPage implements WithHooksInterface {
 	 */
 	public function __construct( AllowlistManager $allowlist, NoticeLogger $logger ) {
 		$this->allowlist = $allowlist;
-		$this->logger = $logger;
+		$this->logger    = $logger;
 	}
 
 	/**
@@ -76,16 +76,16 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function init(): void {
-		// Register settings page under Settings menu
+		// Register settings page under Settings menu.
 		add_action( 'admin_menu', [ $this, 'register_menu' ] );
 
-		// Register settings using WordPress Settings API
+		// Register settings using WordPress Settings API.
 		add_action( 'admin_init', [ $this, 'register_settings' ] );
 
-		// Localize script for admin page (CSS/JS already loaded globally)
+		// Localize script for admin page (CSS/JS already loaded globally).
 		add_action( 'admin_enqueue_scripts', [ $this, 'localize_script' ] );
 
-		// AJAX handlers
+		// AJAX handlers.
 		add_action( 'wp_ajax_qala_add_allowlist_pattern', [ $this, 'handle_add_pattern_ajax' ] );
 		add_action( 'wp_ajax_qala_remove_allowlist_pattern', [ $this, 'handle_remove_pattern_ajax' ] );
 		add_action( 'wp_ajax_qala_toggle_notices', [ $this, 'handle_toggle_ajax' ] );
@@ -122,18 +122,18 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function register_settings(): void {
-		// Register the main setting
+		// Register the main setting.
 		register_setting(
 			'qala_notices',
 			'qala_notices_enabled',
 			[
-				'type' => 'string',
-				'default' => 'yes',
+				'type'              => 'string',
+				'default'           => 'yes',
 				'sanitize_callback' => [ $this, 'sanitize_yes_no' ],
 			]
 		);
 
-		// Add settings section
+		// Add settings section.
 		add_settings_section(
 			'qala_notices_main',
 			__( 'Notice Management Settings', 'qala-plugin-manager' ),
@@ -141,7 +141,7 @@ class AdminPage implements WithHooksInterface {
 			'qala-hide-notices'
 		);
 
-		// Add global toggle field
+		// Add global toggle field.
 		add_settings_field(
 			'qala_notices_enabled',
 			__( 'Enable Notice Hiding', 'qala-plugin-manager' ),
@@ -197,7 +197,7 @@ class AdminPage implements WithHooksInterface {
 	 * @return string Either 'yes' or 'no'
 	 */
 	public function sanitize_yes_no( $value ): string {
-		// Convert to boolean, then to yes/no
+		// Convert to boolean, then to yes/no.
 		$truthy = [ '1', 'yes', 'on', true, 1 ];
 		return in_array( $value, $truthy, true ) ? 'yes' : 'no';
 	}
@@ -213,11 +213,11 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function render_page(): void {
-		// Check capability
+		// Check capability.
 		$this->require_capability( 'qala_full_access' );
 
-		$enabled = get_option( 'qala_notices_enabled', 'yes' );
-		$unique_notices = $this->logger->get_unique_notices();
+		$enabled            = get_option( 'qala_notices_enabled', 'yes' );
+		$unique_notices     = $this->logger->get_unique_notices();
 		$allowlist_patterns = $this->allowlist->get_all_patterns();
 		?>
 		<div class="wrap qala-admin-page">
@@ -373,29 +373,29 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function localize_script( string $hook ): void {
-		// Only localize on our settings page
+		// Only localize on our settings page.
 		if ( $hook !== 'settings_page_qala-hide-notices' ) {
 			return;
 		}
 
-		// Localize script with AJAX data for admin page functionality
+		// Localize script with AJAX data for admin page functionality.
 		wp_localize_script(
 			'qala-plugin-manager',
 			'qalaAdminPage',
 			[
 				'ajaxUrl' => admin_url( 'admin-ajax.php' ),
-				'nonces' => [
-					'addPattern' => wp_create_nonce( 'qala_add_pattern' ),
+				'nonces'  => [
+					'addPattern'    => wp_create_nonce( 'qala_add_pattern' ),
 					'removePattern' => wp_create_nonce( 'qala_remove_pattern' ),
-					'toggle' => wp_create_nonce( 'qala_toggle_notices' ),
+					'toggle'        => wp_create_nonce( 'qala_toggle_notices' ),
 				],
 				'strings' => [
-					'addSuccess' => __( 'Pattern added to allowlist successfully', 'qala-plugin-manager' ),
-					'addError' => __( 'Failed to add pattern to allowlist', 'qala-plugin-manager' ),
+					'addSuccess'    => __( 'Pattern added to allowlist successfully', 'qala-plugin-manager' ),
+					'addError'      => __( 'Failed to add pattern to allowlist', 'qala-plugin-manager' ),
 					'removeSuccess' => __( 'Pattern removed from allowlist successfully', 'qala-plugin-manager' ),
-					'removeError' => __( 'Failed to remove pattern from allowlist', 'qala-plugin-manager' ),
+					'removeError'   => __( 'Failed to remove pattern from allowlist', 'qala-plugin-manager' ),
 					'confirmRemove' => __( 'Are you sure you want to remove this pattern?', 'qala-plugin-manager' ),
-					'emptyPattern' => __( 'Please enter a pattern', 'qala-plugin-manager' ),
+					'emptyPattern'  => __( 'Please enter a pattern', 'qala-plugin-manager' ),
 				],
 			]
 		);
@@ -414,44 +414,48 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function handle_add_pattern_ajax(): void {
-		// Verify nonce
+		// Verify nonce.
 		if ( ! check_ajax_referer( 'qala_add_pattern', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => __( 'Invalid nonce', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Check capability
+		// Check capability.
 		if ( ! $this->user_has_capability( 'qala_full_access' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Permission denied', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Get and sanitize input
-		$pattern = isset( $_POST['pattern'] ) ? sanitize_text_field( wp_unslash( $_POST['pattern'] ) ) : '';
+		// Get and sanitize input.
+		$pattern      = isset( $_POST['pattern'] ) ? sanitize_text_field( wp_unslash( $_POST['pattern'] ) ) : '';
 		$pattern_type = isset( $_POST['pattern_type'] ) ? sanitize_text_field( wp_unslash( $_POST['pattern_type'] ) ) : 'exact';
 
-		// Validate pattern
+		// Validate pattern.
 		if ( empty( $pattern ) ) {
 			wp_send_json_error( [ 'message' => __( 'Pattern cannot be empty', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Validate pattern type
+		// Validate pattern type.
 		$pattern_type = $this->validate_pattern_type( $pattern_type );
 
-		// Add pattern to allowlist
+		// Add pattern to allowlist.
 		$result = $this->allowlist->add_pattern( $pattern, $pattern_type );
 
 		if ( $result ) {
-			wp_send_json_success( [
-				'message' => __( 'Pattern added to allowlist successfully', 'qala-plugin-manager' ),
-				'pattern' => $pattern,
-				'pattern_type' => $pattern_type,
-			] );
+			wp_send_json_success(
+				[
+					'message'      => __( 'Pattern added to allowlist successfully', 'qala-plugin-manager' ),
+					'pattern'      => $pattern,
+					'pattern_type' => $pattern_type,
+				]
+			);
 		} else {
-			wp_send_json_error( [
-				'message' => __( 'Failed to add pattern to allowlist', 'qala-plugin-manager' ),
-			] );
+			wp_send_json_error(
+				[
+					'message' => __( 'Failed to add pattern to allowlist', 'qala-plugin-manager' ),
+				]
+			);
 		}
 	}
 
@@ -466,39 +470,43 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function handle_remove_pattern_ajax(): void {
-		// Verify nonce
+		// Verify nonce.
 		if ( ! check_ajax_referer( 'qala_remove_pattern', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => __( 'Invalid nonce', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Check capability
+		// Check capability.
 		if ( ! $this->user_has_capability( 'qala_full_access' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Permission denied', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Get and sanitize input
+		// Get and sanitize input.
 		$pattern = isset( $_POST['pattern'] ) ? sanitize_text_field( wp_unslash( $_POST['pattern'] ) ) : '';
 
-		// Validate pattern
+		// Validate pattern.
 		if ( empty( $pattern ) ) {
 			wp_send_json_error( [ 'message' => __( 'Pattern cannot be empty', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Remove pattern from allowlist
+		// Remove pattern from allowlist.
 		$result = $this->allowlist->remove_pattern_by_value( $pattern );
 
 		if ( $result ) {
-			wp_send_json_success( [
-				'message' => __( 'Pattern removed from allowlist successfully', 'qala-plugin-manager' ),
-				'pattern' => $pattern,
-			] );
+			wp_send_json_success(
+				[
+					'message' => __( 'Pattern removed from allowlist successfully', 'qala-plugin-manager' ),
+					'pattern' => $pattern,
+				]
+			);
 		} else {
-			wp_send_json_error( [
-				'message' => __( 'Failed to remove pattern from allowlist', 'qala-plugin-manager' ),
-			] );
+			wp_send_json_error(
+				[
+					'message' => __( 'Failed to remove pattern from allowlist', 'qala-plugin-manager' ),
+				]
+			);
 		}
 	}
 
@@ -510,33 +518,35 @@ class AdminPage implements WithHooksInterface {
 	 * @return void
 	 */
 	public function handle_toggle_ajax(): void {
-		// Verify nonce
+		// Verify nonce.
 		if ( ! check_ajax_referer( 'qala_toggle_notices', 'nonce', false ) ) {
 			wp_send_json_error( [ 'message' => __( 'Invalid nonce', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Check capability
+		// Check capability.
 		if ( ! $this->user_has_capability( 'qala_full_access' ) ) {
 			wp_send_json_error( [ 'message' => __( 'Permission denied', 'qala-plugin-manager' ) ] );
 			return;
 		}
 
-		// Get and sanitize input
+		// Get and sanitize input.
 		$enabled = isset( $_POST['enabled'] ) ? sanitize_text_field( wp_unslash( $_POST['enabled'] ) ) : 'no';
 		$enabled = $this->sanitize_yes_no( $enabled );
 
-		// Update option
+		// Update option.
 		$result = update_option( 'qala_notices_enabled', $enabled );
 
 		$message = ( $enabled === 'yes' )
 			? __( 'Notice hiding enabled', 'qala-plugin-manager' )
 			: __( 'Notice hiding disabled', 'qala-plugin-manager' );
 
-		wp_send_json_success( [
-			'message' => $message,
-			'enabled' => $enabled,
-		] );
+		wp_send_json_success(
+			[
+				'message' => $message,
+				'enabled' => $enabled,
+			]
+		);
 	}
 
 	/**

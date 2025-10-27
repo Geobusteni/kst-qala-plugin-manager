@@ -98,9 +98,9 @@ class PluginConfigurations {
 		// Ensure the individual plugins exist before returning.
 		$configuration = array_filter(
 			$configuration,
-      function ( $plugin ) {
-        return file_exists( WP_PLUGIN_DIR. '/'. $plugin );
-      }
+			function ( $plugin ) {
+				return file_exists( WP_PLUGIN_DIR . '/' . $plugin );
+			}
 		);
 
 		return $configuration;

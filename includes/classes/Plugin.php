@@ -68,30 +68,22 @@ class Plugin {
 			)
 		);
 			// Set some useful variables.
-		// Calculate paths dynamically to support both regular plugins and MU plugins
-		$plugin_file = dirname( dirname( __FILE__ ) ); // Path to plugin root from includes/classes
+		// Calculate paths dynamically to support both regular plugins and MU plugins.
+		$plugin_file = dirname( dirname( __FILE__ ) ); // Path to plugin root from includes/classes.
 
-		// Determine if running as MU plugin or regular plugin
+		// Determine if running as MU plugin or regular plugin.
 		if ( defined( 'WPMU_PLUGIN_DIR' ) && strpos( $plugin_file, WPMU_PLUGIN_DIR ) !== false ) {
-			// Running as MU plugin
+			// Running as MU plugin.
 			self::$plugin_path = $plugin_file;
 			self::$plugin_url  = str_replace(
 				untrailingslashit( ABSPATH ),
 				untrailingslashit( site_url() ),
 				$plugin_file
 			);
-			// Debug logging
-			error_log( 'Qala Plugin Manager: Detected MU plugin' );
-			error_log( 'Plugin path: ' . self::$plugin_path );
-			error_log( 'Plugin URL: ' . self::$plugin_url );
 		} else {
-			// Running as regular plugin
+			// Running as regular plugin.
 			self::$plugin_url  = dirname( dirname( untrailingslashit( plugins_url( '/', __FILE__ ) ) ) );
 			self::$plugin_path = dirname( dirname( untrailingslashit( plugin_dir_path( __FILE__ ) ) ) );
-			// Debug logging
-			error_log( 'Qala Plugin Manager: Detected regular plugin' );
-			error_log( 'Plugin path: ' . self::$plugin_path );
-			error_log( 'Plugin URL: ' . self::$plugin_url );
 		}
 
 		self::$plugin_template_path = trailingslashit( self::$plugin_path ) . 'views';
@@ -147,7 +139,7 @@ class Plugin {
 	 * @return void
 	 */
 	protected function register_classes() : void {
-		// Register regular classes (simple instantiation)
+		// Register regular classes (simple instantiation).
 		$classes = $this->service_provider->get_registered_classes();
 		if ( ! empty( $classes ) ) {
 			foreach ( $classes as $class ) {
@@ -159,7 +151,7 @@ class Plugin {
 			}
 		}
 
-		// Register Notice Management components (with dependency injection)
+		// Register Notice Management components (with dependency injection).
 		$notice_components = $this->service_provider->get_notice_management_components();
 		if ( ! empty( $notice_components ) ) {
 			foreach ( $notice_components as $instance ) {

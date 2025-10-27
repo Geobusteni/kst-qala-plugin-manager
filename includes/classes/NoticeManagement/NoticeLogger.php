@@ -81,9 +81,9 @@ class NoticeLogger {
 	): void {
 		global $wpdb;
 
-		// Check if already logged today (deduplication)
+		// Check if already logged today (deduplication).
 		$today_start = gmdate( 'Y-m-d 00:00:00' );
-		$exists = $wpdb->get_var(
+		$exists      = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT id FROM {$this->get_table_name()}
 				 WHERE callback_name = %s
@@ -100,18 +100,18 @@ class NoticeLogger {
 			return; // Already logged today, skip
 		}
 
-		// Insert new log entry
+		// Insert new log entry.
 		$wpdb->insert(
 			$this->get_table_name(),
 			[
 				'callback_name' => $callback_name,
-				'hook_name' => $hook_name,
+				'hook_name'     => $hook_name,
 				'hook_priority' => $priority,
-				'action_taken' => $action,
-				'reason' => $reason,
-				'user_id' => get_current_user_id(),
-				'site_id' => get_current_blog_id(),
-				'created_at' => current_time( 'mysql', true ),
+				'action_taken'  => $action,
+				'reason'        => $reason,
+				'user_id'       => get_current_user_id(),
+				'site_id'       => get_current_blog_id(),
+				'created_at'    => current_time( 'mysql', true ),
 			],
 			[ '%s', '%s', '%d', '%s', '%s', '%d', '%d', '%s' ]
 		);
@@ -205,13 +205,13 @@ class NoticeLogger {
 		global $wpdb;
 		$table = $this->get_table_name();
 
-		// Total entries
+		// Total entries.
 		$total = $wpdb->get_var( "SELECT COUNT(*) FROM {$table}" );
 
-		// Unique callbacks
+		// Unique callbacks.
 		$unique = $wpdb->get_var( "SELECT COUNT(DISTINCT callback_name) FROM {$table}" );
 
-		// Most common callbacks
+		// Most common callbacks.
 		$most_common = $wpdb->get_results(
 			"SELECT callback_name, COUNT(*) as count
 			 FROM {$table}
@@ -221,7 +221,7 @@ class NoticeLogger {
 			ARRAY_A
 		);
 
-		// Actions breakdown
+		// Actions breakdown.
 		$actions = $wpdb->get_results(
 			"SELECT action_taken, COUNT(*) as count
 			 FROM {$table}
@@ -230,10 +230,10 @@ class NoticeLogger {
 		);
 
 		return [
-			'total' => (int) $total,
+			'total'            => (int) $total,
 			'unique_callbacks' => (int) $unique,
-			'most_common' => $most_common ?: [],
-			'actions' => $actions ?: [],
+			'most_common'      => $most_common ?: [],
+			'actions'          => $actions ?: [],
 		];
 	}
 }

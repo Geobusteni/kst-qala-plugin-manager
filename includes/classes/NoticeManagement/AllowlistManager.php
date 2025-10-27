@@ -92,7 +92,7 @@ class AllowlistManager {
 	public function add_pattern( string $pattern, string $type = 'exact' ): bool {
 		global $wpdb;
 
-		// Validate regex patterns before adding
+		// Validate regex patterns before adding.
 		if ( $type === 'regex' ) {
 			if ( ! $this->is_valid_regex( $pattern ) ) {
 				return false;
@@ -103,16 +103,16 @@ class AllowlistManager {
 			$this->get_table_name(),
 			[
 				'pattern_value' => $pattern,
-				'pattern_type' => $type,
-				'is_active' => 1,
-				'created_by' => get_current_user_id(),
-				'created_at' => current_time( 'mysql', true ),
-				'updated_at' => current_time( 'mysql', true ),
+				'pattern_type'  => $type,
+				'is_active'     => 1,
+				'created_by'    => get_current_user_id(),
+				'created_at'    => current_time( 'mysql', true ),
+				'updated_at'    => current_time( 'mysql', true ),
 			],
 			[ '%s', '%s', '%d', '%d', '%s', '%s' ]
 		);
 
-		// Clear cache after modification
+		// Clear cache after modification.
 		$this->clear_cache();
 
 		return (bool) $result;
@@ -134,10 +134,10 @@ class AllowlistManager {
 			[ '%d' ]
 		);
 
-		// Clear cache after modification
+		// Clear cache after modification.
 		$this->clear_cache();
 
-		// Returns number of rows affected, convert to boolean
+		// Returns number of rows affected, convert to boolean.
 		return $result > 0;
 	}
 
@@ -157,10 +157,10 @@ class AllowlistManager {
 			[ '%s' ]
 		);
 
-		// Clear cache after modification
+		// Clear cache after modification.
 		$this->clear_cache();
 
-		// Returns number of rows affected, convert to boolean
+		// Returns number of rows affected, convert to boolean.
 		return $result > 0;
 	}
 
@@ -177,26 +177,31 @@ class AllowlistManager {
 	 *               - is_active: Active status (always 1 for results)
 	 */
 	public function get_all_patterns(): array {
-		// Check cache first
+		// Check cache first.
 		$cached = get_transient( $this->get_cache_key() );
-		if ( false !== $cached ) {
+		if ( $cached !== false ) {
 			return $cached;
 		}
 
 		global $wpdb;
 
-		$query = "SELECT id, pattern_value, pattern_type, is_active
-		          FROM {$this->get_table_name()}
-		          WHERE is_active = 1
-		          ORDER BY created_at DESC";
+		$table_name = $this->get_table_name();
 
-		$results = $wpdb->get_results( $query, ARRAY_A );
+		// phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+		$results = $wpdb->get_results(
+			"SELECT id, pattern_value, pattern_type, is_active
+			FROM {$table_name}
+			WHERE is_active = 1
+			ORDER BY created_at DESC",
+			ARRAY_A
+		);
+		// phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 
-		if ( null === $results ) {
+		if ( $results === null ) {
 			$results = [];
 		}
 
-		// Cache the results
+		// Cache the results.
 		set_transient( $this->get_cache_key(), $results, self::CACHE_EXPIRATION );
 
 		return $results;
@@ -266,10 +271,10 @@ class AllowlistManager {
 	 * @return bool True if matches, false otherwise.
 	 */
 	private function matches_wildcard( string $callback_name, string $wildcard_pattern ): bool {
-		// Escape special regex characters except asterisk
+		// Escape special regex characters except asterisk.
 		$escaped = preg_quote( $wildcard_pattern, '/' );
 
-		// Convert asterisk to regex .* (match any characters)
+		// Convert asterisk to regex .* (match any characters).
 		$regex = '/^' . str_replace( '\*', '.*', $escaped ) . '$/';
 
 		return (bool) preg_match( $regex, $callback_name );
@@ -284,7 +289,8 @@ class AllowlistManager {
 	 * @return bool True if matches, false otherwise.
 	 */
 	private function matches_regex( string $callback_name, string $regex_pattern ): bool {
-		// Suppress warnings for invalid regex
+		// Suppress warnings for invalid regex.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Suppressing errors is intentional for regex validation.
 		return (bool) @preg_match( $regex_pattern, $callback_name );
 	}
 
@@ -296,7 +302,8 @@ class AllowlistManager {
 	 * @return bool True if valid regex, false otherwise.
 	 */
 	private function is_valid_regex( string $pattern ): bool {
-		// Attempt to use the regex, check for errors
+		// Attempt to use the regex, check for errors.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged -- Suppressing errors for regex validation is intentional.
 		return @preg_match( $pattern, null ) !== false;
 	}
 
@@ -315,7 +322,7 @@ class AllowlistManager {
 		$result = $wpdb->update(
 			$this->get_table_name(),
 			[
-				'is_active' => 1,
+				'is_active'  => 1,
 				'updated_at' => current_time( 'mysql', true ),
 			],
 			[ 'id' => $id ],
@@ -323,10 +330,10 @@ class AllowlistManager {
 			[ '%d' ]
 		);
 
-		// Clear cache after modification
+		// Clear cache after modification.
 		$this->clear_cache();
 
-		// Returns number of rows affected, convert to boolean
+		// Returns number of rows affected, convert to boolean.
 		return $result > 0;
 	}
 
@@ -346,7 +353,7 @@ class AllowlistManager {
 		$result = $wpdb->update(
 			$this->get_table_name(),
 			[
-				'is_active' => 0,
+				'is_active'  => 0,
 				'updated_at' => current_time( 'mysql', true ),
 			],
 			[ 'id' => $id ],
@@ -354,10 +361,10 @@ class AllowlistManager {
 			[ '%d' ]
 		);
 
-		// Clear cache after modification
+		// Clear cache after modification.
 		$this->clear_cache();
 
-		// Returns number of rows affected, convert to boolean
+		// Returns number of rows affected, convert to boolean.
 		return $result > 0;
 	}
 }

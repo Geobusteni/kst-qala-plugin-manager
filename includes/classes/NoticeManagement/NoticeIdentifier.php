@@ -47,16 +47,16 @@ class NoticeIdentifier {
 	 * @return string MD5 hash (32 characters).
 	 */
 	public function generate_hash( $callback, string $hook_name ): string {
-		// Extract callback name
+		// Extract callback name.
 		$callback_name = $this->get_callback_name( $callback );
 
-		// Build unique string with site-specific salt
+		// Build unique string with site-specific salt.
 		$site_salt = get_current_blog_id() . '_' . wp_salt( 'nonce' );
 
-		// Include hook name for context-specific identification
+		// Include hook name for context-specific identification.
 		$hash_string = $callback_name . '::' . $hook_name . '::' . $site_salt;
 
-		// Generate MD5 hash (fast, sufficient for identification)
+		// Generate MD5 hash (fast, sufficient for identification).
 		return md5( $hash_string );
 	}
 
@@ -74,17 +74,17 @@ class NoticeIdentifier {
 	 * @return string Human-readable callback name.
 	 */
 	public function get_callback_name( $callback ): string {
-		// Case 1: String function name
+		// Case 1: String function name.
 		if ( is_string( $callback ) ) {
 			return $callback;
 		}
 
-		// Case 2: Array [Class, method] or [Object, method]
+		// Case 2: Array [Class, method] or [Object, method].
 		if ( is_array( $callback ) && count( $callback ) >= 2 ) {
 			$class_or_object = $callback[0];
-			$method = $callback[1];
+			$method          = $callback[1];
 
-			// Get class name (handle both objects and class names)
+			// Get class name (handle both objects and class names).
 			if ( is_object( $class_or_object ) ) {
 				$class_name = get_class( $class_or_object );
 			} elseif ( is_string( $class_or_object ) ) {
@@ -96,18 +96,18 @@ class NoticeIdentifier {
 			return $class_name . '::' . $method;
 		}
 
-		// Case 3: Closure (anonymous function)
+		// Case 3: Closure (anonymous function).
 		if ( $callback instanceof \Closure ) {
-			// Closures cannot be uniquely identified
+			// Closures cannot be uniquely identified.
 			return 'Closure';
 		}
 
-		// Case 4: Invokable object (has __invoke method)
+		// Case 4: Invokable object (has __invoke method).
 		if ( is_object( $callback ) && method_exists( $callback, '__invoke' ) ) {
 			return get_class( $callback ) . '::__invoke';
 		}
 
-		// Fallback: Unknown callback type
+		// Fallback: Unknown callback type.
 		return 'Unknown';
 	}
 
@@ -142,10 +142,10 @@ class NoticeIdentifier {
 	 * @return string Sanitized pattern.
 	 */
 	public function sanitize_pattern( string $pattern ): string {
-		// Use WordPress sanitization
+		// Use WordPress sanitization.
 		$pattern = sanitize_text_field( $pattern );
 
-		// Trim whitespace
+		// Trim whitespace.
 		$pattern = trim( $pattern );
 
 		return $pattern;
@@ -170,30 +170,30 @@ class NoticeIdentifier {
 	 * @return bool True if callback matches pattern, false otherwise.
 	 */
 	public function matches_pattern( $callback, string $pattern ): bool {
-		// Handle empty pattern
+		// Handle empty pattern.
 		if ( empty( $pattern ) ) {
 			return false;
 		}
 
-		// Get callback name for matching
+		// Get callback name for matching.
 		$callback_name = $this->get_callback_name( $callback );
 
-		// Try 1: Exact match (fastest)
+		// Try 1: Exact match (fastest).
 		if ( $callback_name === $pattern ) {
 			return true;
 		}
 
-		// Try 2: Regex pattern (check if valid regex)
+		// Try 2: Regex pattern (check if valid regex).
 		if ( $this->is_valid_regex( $pattern ) ) {
 			return (bool) preg_match( $pattern, $callback_name );
 		}
 
-		// Try 3: Wildcard match (if pattern contains *)
+		// Try 3: Wildcard match (if pattern contains *).
 		if ( strpos( $pattern, '*' ) !== false ) {
 			return $this->matches_wildcard( $callback_name, $pattern );
 		}
 
-		// No match
+		// No match.
 		return false;
 	}
 
@@ -208,8 +208,8 @@ class NoticeIdentifier {
 	 * @return bool True if pattern is valid regex, false otherwise.
 	 */
 	private function is_valid_regex( string $pattern ): bool {
-		// Suppress errors and test if pattern is valid regex
-		// preg_match returns false for invalid patterns
+		// Suppress errors and test if pattern is valid regex.
+		// preg_match returns false for invalid patterns.
 		return @preg_match( $pattern, '' ) !== false;
 	}
 
@@ -231,16 +231,16 @@ class NoticeIdentifier {
 	 * @return bool True if matches, false otherwise.
 	 */
 	private function matches_wildcard( string $callback_name, string $pattern ): bool {
-		// Escape regex special characters except *
+		// Escape regex special characters except *.
 		$escaped_pattern = preg_quote( $pattern, '/' );
 
-		// Convert * to .* (match any characters)
+		// Convert * to .* (match any characters).
 		$regex_pattern = str_replace( '\*', '.*', $escaped_pattern );
 
-		// Wrap in anchors for full string match
+		// Wrap in anchors for full string match.
 		$regex = '/^' . $regex_pattern . '$/';
 
-		// Match callback name against regex
+		// Match callback name against regex.
 		return (bool) preg_match( $regex, $callback_name );
 	}
 }

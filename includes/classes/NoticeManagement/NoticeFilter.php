@@ -60,17 +60,17 @@ class NoticeFilter implements WithHooksInterface {
 	/**
 	 * Constructor
 	 *
-	 * @param AllowlistManager  $allowlist Allowlist manager instance.
-	 * @param NoticeLogger      $logger Logger instance.
-	 * @param NoticeIdentifier  $identifier Identifier instance.
+	 * @param AllowlistManager $allowlist Allowlist manager instance.
+	 * @param NoticeLogger     $logger Logger instance.
+	 * @param NoticeIdentifier $identifier Identifier instance.
 	 */
 	public function __construct(
 		AllowlistManager $allowlist,
 		NoticeLogger $logger,
 		NoticeIdentifier $identifier
 	) {
-		$this->allowlist = $allowlist;
-		$this->logger = $logger;
+		$this->allowlist  = $allowlist;
+		$this->logger     = $logger;
 		$this->identifier = $identifier;
 	}
 
@@ -90,7 +90,7 @@ class NoticeFilter implements WithHooksInterface {
 	 * @return void
 	 */
 	public function init(): void {
-		// Main hook: Filter notices at latest possible moment before they render
+		// Main hook: Filter notices at latest possible moment before they render.
 		add_action( 'in_admin_header', [ $this, 'filter_notices' ], 100000 );
 	}
 
@@ -135,36 +135,38 @@ class NoticeFilter implements WithHooksInterface {
 	 * @return void
 	 */
 	public function filter_notices(): void {
-		// DEBUG: Log that we're running
+		// DEBUG: Log that we're running.
 		error_log( '=== NoticeFilter::filter_notices() START ===' );
 
 		$current_user_id = get_current_user_id();
-		$has_capability = $this->user_has_capability( 'qala_full_access' );
-		$global_toggle = get_option( 'qala_notices_enabled', 'yes' );
-		$user_toggle = get_user_meta( $current_user_id, 'qala_show_notices', true );
+		$has_capability  = $this->user_has_capability( 'qala_full_access' );
+		$global_toggle   = get_option( 'qala_notices_enabled', 'yes' );
+		$user_toggle     = get_user_meta( $current_user_id, 'qala_show_notices', true );
 
-		error_log( sprintf(
-			'NoticeFilter: User ID=%d, Has qala_full_access=%s, Global toggle=%s, User toggle=%s',
-			$current_user_id,
-			$has_capability ? 'YES' : 'NO',
-			$global_toggle,
-			$user_toggle ?: '(empty)'
-		) );
+		error_log(
+			sprintf(
+				'NoticeFilter: User ID=%d, Has qala_full_access=%s, Global toggle=%s, User toggle=%s',
+				$current_user_id,
+				$has_capability ? 'YES' : 'NO',
+				$global_toggle,
+				$user_toggle ?: '(empty)'
+			)
+		);
 
-		// Skip filtering (show notices) if user has qala_full_access capability
+		// Skip filtering (show notices) if user has qala_full_access capability.
 		if ( $has_capability ) {
 			error_log( 'NoticeFilter: User has qala_full_access - SHOWING all notices' );
 			return;
 		}
 
-		// Skip filtering (show notices) if global toggle is enabled (yes)
-		// FIXED BUG: Was checking for 'no', should check for 'yes'
+		// Skip filtering (show notices) if global toggle is enabled (yes).
+		// FIXED BUG: Was checking for 'no', should check for 'yes'.
 		if ( $global_toggle === 'yes' ) {
 			error_log( 'NoticeFilter: Global toggle is ENABLED - SHOWING all notices' );
 			return;
 		}
 
-		// Skip filtering (show notices) if user wants to see them
+		// Skip filtering (show notices) if user wants to see them.
 		if ( $user_toggle === 'yes' ) {
 			error_log( 'NoticeFilter: User toggle is YES - SHOWING all notices' );
 			return;
@@ -172,23 +174,25 @@ class NoticeFilter implements WithHooksInterface {
 
 		error_log( 'NoticeFilter: Proceeding to HIDE notices (nuclear mode)' );
 
-		// Access global $wp_filter to manipulate hooks
+		// Access global $wp_filter to manipulate hooks.
 		global $wp_filter;
 
-		// Process each notice hook
+		// Process each notice hook.
 		$total_removed = 0;
-		$total_kept = 0;
+		$total_kept    = 0;
 		foreach ( $this->get_notice_hooks() as $hook_name ) {
-			$stats = $this->remove_notice_callbacks( $hook_name );
+			$stats          = $this->remove_notice_callbacks( $hook_name );
 			$total_removed += $stats['removed'];
-			$total_kept += $stats['kept'];
+			$total_kept    += $stats['kept'];
 		}
 
-		error_log( sprintf(
-			'NoticeFilter: Processed hooks - Removed: %d, Kept: %d',
-			$total_removed,
-			$total_kept
-		) );
+		error_log(
+			sprintf(
+				'NoticeFilter: Processed hooks - Removed: %d, Kept: %d',
+				$total_removed,
+				$total_kept
+			)
+		);
 		error_log( '=== NoticeFilter::filter_notices() END ===' );
 	}
 
@@ -207,16 +211,16 @@ class NoticeFilter implements WithHooksInterface {
 
 		$stats = [
 			'removed' => 0,
-			'kept' => 0,
+			'kept'    => 0,
 		];
 
-		// Check if hook exists
+		// Check if hook exists.
 		if ( ! isset( $wp_filter[ $hook_name ] ) ) {
 			error_log( sprintf( 'NoticeFilter: Hook "%s" does not exist in $wp_filter', $hook_name ) );
 			return $stats;
 		}
 
-		// Check if hook has callbacks
+		// Check if hook has callbacks.
 		if ( empty( $wp_filter[ $hook_name ]->callbacks ) ) {
 			error_log( sprintf( 'NoticeFilter: Hook "%s" has no callbacks', $hook_name ) );
 			return $stats;
@@ -224,23 +228,23 @@ class NoticeFilter implements WithHooksInterface {
 
 		error_log( sprintf( 'NoticeFilter: Processing hook "%s"', $hook_name ) );
 
-		// Iterate through all priorities
+		// Iterate through all priorities.
 		foreach ( $wp_filter[ $hook_name ]->callbacks as $priority => $callbacks ) {
-			// Skip if no callbacks at this priority
+			// Skip if no callbacks at this priority.
 			if ( empty( $callbacks ) ) {
 				continue;
 			}
 
 			error_log( sprintf( 'NoticeFilter: Hook "%s" has %d callbacks at priority %d', $hook_name, count( $callbacks ), $priority ) );
 
-			// Iterate through all callbacks at this priority
+			// Iterate through all callbacks at this priority.
 			foreach ( $callbacks as $id => $callback_data ) {
-				$callback = $callback_data['function'];
+				$callback      = $callback_data['function'];
 				$callback_name = $this->identifier->get_callback_name( $callback );
 
-				// Check if callback should be kept
+				// Check if callback should be kept.
 				if ( $this->should_keep_callback( $callback, $hook_name ) ) {
-					// Log that callback was kept (allowlisted)
+					// Log that callback was kept (allowlisted).
 					error_log( sprintf( 'NoticeFilter: KEEPING callback "%s" (allowlisted)', $callback_name ) );
 					$this->log_callback_action(
 						$callback,
@@ -252,11 +256,11 @@ class NoticeFilter implements WithHooksInterface {
 					continue;
 				}
 
-				// Remove callback from hook
+				// Remove callback from hook.
 				error_log( sprintf( 'NoticeFilter: REMOVING callback "%s"', $callback_name ) );
 				unset( $wp_filter[ $hook_name ]->callbacks[ $priority ][ $id ] );
 
-				// Log removal
+				// Log removal.
 				$this->log_callback_action(
 					$callback,
 					$hook_name,
@@ -279,10 +283,10 @@ class NoticeFilter implements WithHooksInterface {
 	 * @return bool True if callback should be kept, false if should be removed.
 	 */
 	public function should_keep_callback( $callback, string $hook_name ): bool {
-		// Get callback name for allowlist checking
+		// Get callback name for allowlist checking.
 		$callback_name = $this->identifier->get_callback_name( $callback );
 
-		// Check if callback is allowlisted
+		// Check if callback is allowlisted.
 		return $this->allowlist->matches_allowlist( $callback_name );
 	}
 
@@ -299,15 +303,15 @@ class NoticeFilter implements WithHooksInterface {
 	 * @return void
 	 */
 	private function log_callback_action( $callback, string $hook_name, int $priority, string $action ): void {
-		// Get callback name for logging
+		// Get callback name for logging.
 		$callback_name = $this->identifier->get_callback_name( $callback );
 
-		// Determine reason based on action
+		// Determine reason based on action.
 		$reason = ( $action === 'kept_allowlisted' )
 			? 'matches_allowlist_pattern'
 			: 'no_qala_full_access';
 
-		// Log to database
+		// Log to database.
 		$this->logger->log_removal(
 			$callback_name,
 			$hook_name,

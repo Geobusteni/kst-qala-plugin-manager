@@ -87,15 +87,15 @@ class BodyClassManager implements WithHooksInterface {
 	public function add_body_classes( string $classes ): string {
 		$class_array = [];
 
-		// Check if user has qala_full_access
-		$has_access = $this->user_has_capability( 'qala_full_access' );
+		// Check if user has qala_full_access.
+		$has_access    = $this->user_has_capability( 'qala_full_access' );
 		$class_array[] = $has_access ? 'qala-has-full-access' : 'qala-no-full-access';
 
-		// Check if notices should be visible
-		$should_show = $this->should_show_notices();
+		// Check if notices should be visible.
+		$should_show   = $this->should_show_notices();
 		$class_array[] = $should_show ? 'qala-notices-visible' : 'qala-notices-hidden';
 
-		// Add all classes
+		// Add all classes.
 		$classes .= ' ' . implode( ' ', $class_array );
 
 		return $classes;
@@ -116,23 +116,23 @@ class BodyClassManager implements WithHooksInterface {
 	 * @return bool True if notices should be visible, false if hidden.
 	 */
 	private function should_show_notices(): bool {
-		// If user has capability, they can see notices by default
+		// If user has capability, they can see notices by default.
 		if ( $this->user_has_capability( 'qala_full_access' ) ) {
-			// But check their personal preference
+			// But check their personal preference.
 			$user_pref = get_user_meta( get_current_user_id(), 'qala_show_notices', true );
 			if ( $user_pref === 'no' ) {
-				return false; // User toggled them off
+				return false; // User toggled them off.
 			}
-			return true; // Show by default
+			return true; // Show by default.
 		}
 
-		// User without capability - check global toggle
+		// User without capability - check global toggle.
 		$global_toggle = get_option( 'qala_notices_enabled', 'no' );
 		if ( $global_toggle === 'yes' ) {
-			return true; // Global setting says show
+			return true; // Global setting says show.
 		}
 
-		return false; // Hide by default for non-privileged users
+		return false; // Hide by default for non-privileged users.
 	}
 
 	/**
@@ -148,30 +148,30 @@ class BodyClassManager implements WithHooksInterface {
 	 * @return void
 	 */
 	public function localize_allowlist_patterns(): void {
-		// Only localize if notices are hidden
+		// Only localize if notices are hidden.
 		if ( ! $this->should_hide_notices() ) {
 			return;
 		}
 
-		// Get all allowlist patterns
+		// Get all allowlist patterns.
 		$patterns = $this->allowlist->get_all_patterns();
 
-		// Prepare patterns for JavaScript
+		// Prepare patterns for JavaScript.
 		$js_patterns = [];
 		foreach ( $patterns as $pattern ) {
 			$js_patterns[] = [
 				'value' => $pattern['pattern_value'],
-				'type' => $pattern['pattern_type'],
+				'type'  => $pattern['pattern_type'],
 			];
 		}
 
-		// Localize for JavaScript
+		// Localize for JavaScript.
 		wp_localize_script(
 			'qala-plugin-manager',
 			'qalaAllowlistPatterns',
 			[
 				'patterns' => $js_patterns,
-				'enabled' => true,
+				'enabled'  => true,
 			]
 		);
 	}

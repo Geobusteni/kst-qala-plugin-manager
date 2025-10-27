@@ -51,7 +51,7 @@ class AllowlistManagerTest extends TestCase {
 		parent::setUp();
 
 		// Create wpdb mock
-		$this->wpdb_mock = Mockery::mock( 'wpdb' );
+		$this->wpdb_mock         = Mockery::mock( 'wpdb' );
 		$this->wpdb_mock->prefix = 'wp_';
 
 		// Set global wpdb
@@ -62,9 +62,11 @@ class AllowlistManagerTest extends TestCase {
 		$this->manager = new AllowlistManager();
 
 		// Mock WordPress time function
-		Functions\when( 'current_time' )->alias( function ( $type ) {
-			return gmdate( 'Y-m-d H:i:s' );
-		} );
+		Functions\when( 'current_time' )->alias(
+			function ( $type ) {
+				return gmdate( 'Y-m-d H:i:s' );
+			}
+		);
 
 		// Mock get_current_user_id
 		$this->mockGetCurrentUserId( 1 );
@@ -86,20 +88,22 @@ class AllowlistManagerTest extends TestCase {
 	 */
 	public function test_add_pattern_adds_exact_pattern_successfully(): void {
 		$pattern = 'rocket_bad_deactivations';
-		$type = 'exact';
+		$type    = 'exact';
 
 		$this->wpdb_mock->shouldReceive( 'insert' )
 			->once()
 			->with(
 				'wp_qala_notice_allowlist',
-				Mockery::on( function ( $data ) use ( $pattern, $type ) {
-					return $data['pattern_value'] === $pattern
+				Mockery::on(
+					function ( $data ) use ( $pattern, $type ) {
+						return $data['pattern_value'] === $pattern
 						&& $data['pattern_type'] === $type
 						&& $data['is_active'] === 1
 						&& $data['created_by'] === 1
 						&& isset( $data['created_at'] )
 						&& isset( $data['updated_at'] );
-				} ),
+					}
+				),
 				[ '%s', '%s', '%d', '%d', '%s', '%s' ]
 			)
 			->andReturn( 1 );
@@ -116,7 +120,7 @@ class AllowlistManagerTest extends TestCase {
 	 */
 	public function test_add_pattern_adds_wildcard_pattern_successfully(): void {
 		$pattern = 'rocket_*';
-		$type = 'wildcard';
+		$type    = 'wildcard';
 
 		$this->wpdb_mock->shouldReceive( 'insert' )
 			->once()
@@ -134,7 +138,7 @@ class AllowlistManagerTest extends TestCase {
 	 */
 	public function test_add_pattern_adds_regex_pattern_successfully(): void {
 		$pattern = '/^rocket_.*$/';
-		$type = 'regex';
+		$type    = 'regex';
 
 		$this->wpdb_mock->shouldReceive( 'insert' )
 			->once()
@@ -157,9 +161,11 @@ class AllowlistManagerTest extends TestCase {
 			->once()
 			->with(
 				'wp_qala_notice_allowlist',
-				Mockery::on( function ( $data ) {
-					return $data['pattern_type'] === 'exact';
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return $data['pattern_type'] === 'exact';
+					}
+				),
 				Mockery::any()
 			)
 			->andReturn( 1 );
@@ -214,10 +220,12 @@ class AllowlistManagerTest extends TestCase {
 			->once()
 			->with(
 				'wp_qala_notice_allowlist',
-				Mockery::on( function ( $data ) use ( $sql_injection_attempt ) {
-					// Pattern should be stored as-is, prepared statements handle safety
-					return $data['pattern_value'] === $sql_injection_attempt;
-				} ),
+				Mockery::on(
+					function ( $data ) use ( $sql_injection_attempt ) {
+						// Pattern should be stored as-is, prepared statements handle safety
+						return $data['pattern_value'] === $sql_injection_attempt;
+					}
+				),
 				Mockery::any()
 			)
 			->andReturn( 1 );
@@ -292,22 +300,22 @@ class AllowlistManagerTest extends TestCase {
 	public function test_get_all_patterns_returns_active_patterns(): void {
 		$expected_patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'rocket_bad_deactivations',
-				'pattern_type' => 'exact',
-				'is_active' => 1,
+				'pattern_type'  => 'exact',
+				'is_active'     => 1,
 			],
 			[
-				'id' => 2,
+				'id'            => 2,
 				'pattern_value' => 'rocket_*',
-				'pattern_type' => 'wildcard',
-				'is_active' => 1,
+				'pattern_type'  => 'wildcard',
+				'is_active'     => 1,
 			],
 			[
-				'id' => 3,
+				'id'            => 3,
 				'pattern_value' => '/^woo_.*$/',
-				'pattern_type' => 'regex',
-				'is_active' => 1,
+				'pattern_type'  => 'regex',
+				'is_active'     => 1,
 			],
 		];
 
@@ -319,11 +327,13 @@ class AllowlistManagerTest extends TestCase {
 		$this->wpdb_mock->shouldReceive( 'get_results' )
 			->once()
 			->with(
-				Mockery::on( function ( $query ) {
-					return strpos( $query, 'SELECT' ) !== false
+				Mockery::on(
+					function ( $query ) {
+						return strpos( $query, 'SELECT' ) !== false
 						&& strpos( $query, 'is_active = 1' ) !== false
 						&& strpos( $query, 'wp_qala_notice_allowlist' ) !== false;
-				} ),
+					}
+				),
 				ARRAY_A
 			)
 			->andReturn( $expected_patterns );
@@ -363,10 +373,10 @@ class AllowlistManagerTest extends TestCase {
 	public function test_get_all_patterns_uses_cache_when_available(): void {
 		$cached_patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'cached_pattern',
-				'pattern_type' => 'exact',
-				'is_active' => 1,
+				'pattern_type'  => 'exact',
+				'is_active'     => 1,
 			],
 		];
 
@@ -395,10 +405,12 @@ class AllowlistManagerTest extends TestCase {
 		$this->wpdb_mock->shouldReceive( 'get_results' )
 			->once()
 			->with(
-				Mockery::on( function ( $query ) {
-					// Verify WHERE clause includes is_active = 1
-					return strpos( $query, 'WHERE is_active = 1' ) !== false;
-				} ),
+				Mockery::on(
+					function ( $query ) {
+						// Verify WHERE clause includes is_active = 1
+						return strpos( $query, 'WHERE is_active = 1' ) !== false;
+					}
+				),
 				ARRAY_A
 			)
 			->andReturn( [] );
@@ -417,10 +429,10 @@ class AllowlistManagerTest extends TestCase {
 	public function test_matches_allowlist_with_exact_pattern(): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'rocket_bad_deactivations',
-				'pattern_type' => 'exact',
-				'is_active' => 1,
+				'pattern_type'  => 'exact',
+				'is_active'     => 1,
 			],
 		];
 
@@ -441,10 +453,10 @@ class AllowlistManagerTest extends TestCase {
 	public function test_matches_allowlist_with_wildcard_pattern(): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'rocket_*',
-				'pattern_type' => 'wildcard',
-				'is_active' => 1,
+				'pattern_type'  => 'wildcard',
+				'is_active'     => 1,
 			],
 		];
 
@@ -465,10 +477,10 @@ class AllowlistManagerTest extends TestCase {
 	public function test_matches_allowlist_with_regex_pattern(): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => '/^rocket_.*$/',
-				'pattern_type' => 'regex',
-				'is_active' => 1,
+				'pattern_type'  => 'regex',
+				'is_active'     => 1,
 			],
 		];
 
@@ -489,10 +501,10 @@ class AllowlistManagerTest extends TestCase {
 	public function test_matches_allowlist_returns_false_when_no_match(): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'rocket_*',
-				'pattern_type' => 'wildcard',
-				'is_active' => 1,
+				'pattern_type'  => 'wildcard',
+				'is_active'     => 1,
 			],
 		];
 
@@ -528,22 +540,22 @@ class AllowlistManagerTest extends TestCase {
 	public function test_matches_allowlist_checks_multiple_patterns(): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'exact_match',
-				'pattern_type' => 'exact',
-				'is_active' => 1,
+				'pattern_type'  => 'exact',
+				'is_active'     => 1,
 			],
 			[
-				'id' => 2,
+				'id'            => 2,
 				'pattern_value' => 'rocket_*',
-				'pattern_type' => 'wildcard',
-				'is_active' => 1,
+				'pattern_type'  => 'wildcard',
+				'is_active'     => 1,
 			],
 			[
-				'id' => 3,
+				'id'            => 3,
 				'pattern_value' => '/^woo_.*$/',
-				'pattern_type' => 'regex',
-				'is_active' => 1,
+				'pattern_type'  => 'regex',
+				'is_active'     => 1,
 			],
 		];
 
@@ -569,9 +581,11 @@ class AllowlistManagerTest extends TestCase {
 			->once()
 			->with(
 				'wp_qala_notice_allowlist',
-				Mockery::on( function ( $data ) {
-					return $data['is_active'] === 1 && isset( $data['updated_at'] );
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return $data['is_active'] === 1 && isset( $data['updated_at'] );
+					}
+				),
 				[ 'id' => $pattern_id ],
 				[ '%d', '%s' ],
 				[ '%d' ]
@@ -612,9 +626,11 @@ class AllowlistManagerTest extends TestCase {
 			->once()
 			->with(
 				'wp_qala_notice_allowlist',
-				Mockery::on( function ( $data ) {
-					return $data['is_active'] === 0 && isset( $data['updated_at'] );
-				} ),
+				Mockery::on(
+					function ( $data ) {
+						return $data['is_active'] === 0 && isset( $data['updated_at'] );
+					}
+				),
 				[ 'id' => $pattern_id ],
 				[ '%d', '%s' ],
 				[ '%d' ]
@@ -752,34 +768,34 @@ class AllowlistManagerTest extends TestCase {
 	 */
 	public function wildcard_pattern_matching_provider(): array {
 		return [
-			'prefix_wildcard_match' => [
-				'pattern' => 'rocket_*',
-				'callback' => 'rocket_bad_deactivations',
+			'prefix_wildcard_match'    => [
+				'pattern'      => 'rocket_*',
+				'callback'     => 'rocket_bad_deactivations',
 				'should_match' => true,
 			],
 			'prefix_wildcard_no_match' => [
-				'pattern' => 'rocket_*',
-				'callback' => 'woocommerce_notice',
+				'pattern'      => 'rocket_*',
+				'callback'     => 'woocommerce_notice',
 				'should_match' => false,
 			],
-			'suffix_wildcard_match' => [
-				'pattern' => '*_notice',
-				'callback' => 'woocommerce_notice',
+			'suffix_wildcard_match'    => [
+				'pattern'      => '*_notice',
+				'callback'     => 'woocommerce_notice',
 				'should_match' => true,
 			],
 			'suffix_wildcard_no_match' => [
-				'pattern' => '*_notice',
-				'callback' => 'rocket_bad_deactivations',
+				'pattern'      => '*_notice',
+				'callback'     => 'rocket_bad_deactivations',
 				'should_match' => false,
 			],
-			'middle_wildcard_match' => [
-				'pattern' => 'My*::method',
-				'callback' => 'MyClass::method',
+			'middle_wildcard_match'    => [
+				'pattern'      => 'My*::method',
+				'callback'     => 'MyClass::method',
 				'should_match' => true,
 			],
 			'multiple_wildcards_match' => [
-				'pattern' => '*Commerce*::*',
-				'callback' => 'WooCommerce_Helper::show_notice',
+				'pattern'      => '*Commerce*::*',
+				'callback'     => 'WooCommerce_Helper::show_notice',
 				'should_match' => true,
 			],
 		];
@@ -803,10 +819,10 @@ class AllowlistManagerTest extends TestCase {
 	): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => $pattern,
-				'pattern_type' => 'wildcard',
-				'is_active' => 1,
+				'pattern_type'  => 'wildcard',
+				'is_active'     => 1,
 			],
 		];
 
@@ -835,29 +851,29 @@ class AllowlistManagerTest extends TestCase {
 	 */
 	public function regex_pattern_matching_provider(): array {
 		return [
-			'simple_regex_match' => [
-				'pattern' => '/^rocket_.*$/',
-				'callback' => 'rocket_bad_deactivations',
+			'simple_regex_match'           => [
+				'pattern'      => '/^rocket_.*$/',
+				'callback'     => 'rocket_bad_deactivations',
 				'should_match' => true,
 			],
-			'simple_regex_no_match' => [
-				'pattern' => '/^rocket_.*$/',
-				'callback' => 'woocommerce_notice',
+			'simple_regex_no_match'        => [
+				'pattern'      => '/^rocket_.*$/',
+				'callback'     => 'woocommerce_notice',
 				'should_match' => false,
 			],
 			'case_insensitive_regex_match' => [
-				'pattern' => '/^ROCKET_/i',
-				'callback' => 'rocket_bad_deactivations',
+				'pattern'      => '/^ROCKET_/i',
+				'callback'     => 'rocket_bad_deactivations',
 				'should_match' => true,
 			],
-			'complex_regex_match' => [
-				'pattern' => '/^[A-Z][A-Za-z]+::[a-z_]+$/',
-				'callback' => 'MyClass::show_notice',
+			'complex_regex_match'          => [
+				'pattern'      => '/^[A-Z][A-Za-z]+::[a-z_]+$/',
+				'callback'     => 'MyClass::show_notice',
 				'should_match' => true,
 			],
-			'digit_regex_match' => [
-				'pattern' => '/^callback_\d+$/',
-				'callback' => 'callback_123',
+			'digit_regex_match'            => [
+				'pattern'      => '/^callback_\d+$/',
+				'callback'     => 'callback_123',
 				'should_match' => true,
 			],
 		];
@@ -881,10 +897,10 @@ class AllowlistManagerTest extends TestCase {
 	): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => $pattern,
-				'pattern_type' => 'regex',
-				'is_active' => 1,
+				'pattern_type'  => 'regex',
+				'is_active'     => 1,
 			],
 		];
 
@@ -934,9 +950,11 @@ class AllowlistManagerTest extends TestCase {
 			->once()
 			->with(
 				'wp_qala_notice_allowlist',
-				Mockery::on( function ( $data ) use ( $long_pattern ) {
-					return $data['pattern_value'] === $long_pattern;
-				} ),
+				Mockery::on(
+					function ( $data ) use ( $long_pattern ) {
+						return $data['pattern_value'] === $long_pattern;
+					}
+				),
 				Mockery::any()
 			)
 			->andReturn( 1 );
@@ -955,10 +973,10 @@ class AllowlistManagerTest extends TestCase {
 	public function test_exact_pattern_matching_is_case_sensitive(): void {
 		$patterns = [
 			[
-				'id' => 1,
+				'id'            => 1,
 				'pattern_value' => 'MyCallback',
-				'pattern_type' => 'exact',
-				'is_active' => 1,
+				'pattern_type'  => 'exact',
+				'is_active'     => 1,
 			],
 		];
 

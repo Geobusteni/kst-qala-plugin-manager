@@ -72,7 +72,7 @@ class AdminPageTest extends TestCase {
 
 		// Create mocks for dependencies
 		$this->allowlist_mock = Mockery::mock( AllowlistManager::class );
-		$this->logger_mock = Mockery::mock( NoticeLogger::class );
+		$this->logger_mock    = Mockery::mock( NoticeLogger::class );
 
 		// Create AdminPage instance with mocked dependencies
 		$this->admin_page = new AdminPage(
@@ -206,9 +206,11 @@ class AdminPageTest extends TestCase {
 	public function test_register_menu_requires_qala_full_access(): void {
 		Functions\expect( 'add_options_page' )
 			->once()
-			->withArgs( function ( $page_title, $menu_title, $capability ) {
-				return $capability === 'qala_full_access';
-			} )
+			->withArgs(
+				function ( $page_title, $menu_title, $capability ) {
+					return $capability === 'qala_full_access';
+				}
+			)
 			->andReturn( 'settings_page_qala-hide-notices' );
 
 		$this->admin_page->register_menu();
@@ -225,11 +227,13 @@ class AdminPageTest extends TestCase {
 			->with(
 				'qala_notices',
 				'qala_notices_enabled',
-				Mockery::on( function ( $args ) {
-					return $args['type'] === 'string'
+				Mockery::on(
+					function ( $args ) {
+						return $args['type'] === 'string'
 						&& $args['default'] === 'yes'
 						&& is_callable( $args['sanitize_callback'] );
-				} )
+					}
+				)
 			);
 
 		Functions\expect( 'add_settings_section' )->once();
@@ -338,12 +342,16 @@ class AdminPageTest extends TestCase {
 			->with( 'qala_notices_enabled', 'yes' )
 			->andReturn( 'yes' );
 
-		Functions\when( 'esc_html_e' )->alias( function ( $text ) {
-			echo $text;
-		} );
-		Functions\when( 'esc_attr_e' )->alias( function ( $text ) {
-			echo $text;
-		} );
+		Functions\when( 'esc_html_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
+		Functions\when( 'esc_attr_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
 		Functions\when( 'checked' )->returnArg();
 
 		Functions\expect( 'settings_fields' )->once();
@@ -431,13 +439,15 @@ class AdminPageTest extends TestCase {
 			->with(
 				'qala-admin-page',
 				'qalaAdminPage',
-				Mockery::on( function ( $data ) {
-					return isset( $data['ajaxUrl'] )
+				Mockery::on(
+					function ( $data ) {
+						return isset( $data['ajaxUrl'] )
 						&& isset( $data['nonces'] )
 						&& isset( $data['nonces']['addPattern'] )
 						&& isset( $data['nonces']['removePattern'] )
 						&& isset( $data['nonces']['toggle'] );
-				} )
+					}
+				)
 			);
 
 		Functions\when( 'wp_create_nonce' )->justReturn( 'test-nonce' );
@@ -452,7 +462,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_add_pattern_ajax_verifies_nonce(): void {
-		$_POST['nonce'] = 'invalid-nonce';
+		$_POST['nonce']   = 'invalid-nonce';
 		$_POST['pattern'] = 'test_pattern';
 
 		Functions\expect( 'check_ajax_referer' )
@@ -473,7 +483,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_add_pattern_ajax_checks_capability(): void {
-		$_POST['nonce'] = 'valid-nonce';
+		$_POST['nonce']   = 'valid-nonce';
 		$_POST['pattern'] = 'test_pattern';
 
 		Functions\expect( 'check_ajax_referer' )
@@ -495,8 +505,8 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_add_pattern_ajax_sanitizes_pattern(): void {
-		$_POST['nonce'] = 'valid-nonce';
-		$_POST['pattern'] = '<script>alert("xss")</script>rocket_*';
+		$_POST['nonce']        = 'valid-nonce';
+		$_POST['pattern']      = '<script>alert("xss")</script>rocket_*';
 		$_POST['pattern_type'] = 'wildcard';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -527,7 +537,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_add_pattern_ajax_validates_empty_pattern(): void {
-		$_POST['nonce'] = 'valid-nonce';
+		$_POST['nonce']   = 'valid-nonce';
 		$_POST['pattern'] = '';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -546,8 +556,8 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_add_pattern_ajax_adds_pattern_successfully(): void {
-		$_POST['nonce'] = 'valid-nonce';
-		$_POST['pattern'] = 'rocket_*';
+		$_POST['nonce']        = 'valid-nonce';
+		$_POST['pattern']      = 'rocket_*';
 		$_POST['pattern_type'] = 'wildcard';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -575,8 +585,8 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_add_pattern_ajax_handles_database_error(): void {
-		$_POST['nonce'] = 'valid-nonce';
-		$_POST['pattern'] = 'rocket_*';
+		$_POST['nonce']        = 'valid-nonce';
+		$_POST['pattern']      = 'rocket_*';
 		$_POST['pattern_type'] = 'wildcard';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -599,7 +609,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_remove_pattern_ajax_verifies_nonce(): void {
-		$_POST['nonce'] = 'invalid-nonce';
+		$_POST['nonce']   = 'invalid-nonce';
 		$_POST['pattern'] = 'test_pattern';
 
 		Functions\expect( 'check_ajax_referer' )
@@ -620,7 +630,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_remove_pattern_ajax_removes_pattern_successfully(): void {
-		$_POST['nonce'] = 'valid-nonce';
+		$_POST['nonce']   = 'valid-nonce';
 		$_POST['pattern'] = 'rocket_*';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -668,7 +678,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_toggle_ajax_toggles_option_successfully(): void {
-		$_POST['nonce'] = 'valid-nonce';
+		$_POST['nonce']   = 'valid-nonce';
 		$_POST['enabled'] = 'yes';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -681,7 +691,12 @@ class AdminPageTest extends TestCase {
 
 		Functions\expect( 'wp_send_json_success' )
 			->once()
-			->with( [ 'message' => 'Notice hiding enabled', 'enabled' => 'yes' ] );
+			->with(
+				[
+					'message' => 'Notice hiding enabled',
+					'enabled' => 'yes',
+				]
+			);
 
 		$this->admin_page->handle_toggle_ajax();
 	}
@@ -692,7 +707,7 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_handle_toggle_ajax_handles_invalid_value(): void {
-		$_POST['nonce'] = 'valid-nonce';
+		$_POST['nonce']   = 'valid-nonce';
 		$_POST['enabled'] = 'invalid';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );
@@ -743,23 +758,29 @@ class AdminPageTest extends TestCase {
 		Functions\when( 'do_settings_sections' )->justReturn( null );
 		Functions\when( 'submit_button' )->justReturn( null );
 		Functions\when( 'wp_nonce_field' )->justReturn( null );
-		Functions\when( 'esc_html_e' )->alias( function ( $text ) {
-			echo $text;
-		} );
-		Functions\when( 'esc_attr_e' )->alias( function ( $text ) {
-			echo $text;
-		} );
+		Functions\when( 'esc_html_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
+		Functions\when( 'esc_attr_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
 		Functions\when( 'checked' )->returnArg();
 
 		$this->logger_mock->shouldReceive( 'get_unique_notices' )
 			->once()
-			->andReturn( [
+			->andReturn(
 				[
-					'callback_name' => 'test_function',
-					'hook_name' => 'admin_notices',
-					'last_seen' => '2025-10-25 10:00:00',
-				],
-			] );
+					[
+						'callback_name' => 'test_function',
+						'hook_name'     => 'admin_notices',
+						'last_seen'     => '2025-10-25 10:00:00',
+					],
+				]
+			);
 
 		$this->allowlist_mock->shouldReceive( 'get_all_patterns' )
 			->andReturn( [] );
@@ -784,12 +805,16 @@ class AdminPageTest extends TestCase {
 		Functions\when( 'do_settings_sections' )->justReturn( null );
 		Functions\when( 'submit_button' )->justReturn( null );
 		Functions\when( 'wp_nonce_field' )->justReturn( null );
-		Functions\when( 'esc_html_e' )->alias( function ( $text ) {
-			echo $text;
-		} );
-		Functions\when( 'esc_attr_e' )->alias( function ( $text ) {
-			echo $text;
-		} );
+		Functions\when( 'esc_html_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
+		Functions\when( 'esc_attr_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
 		Functions\when( 'checked' )->returnArg();
 
 		$this->logger_mock->shouldReceive( 'get_unique_notices' )
@@ -797,12 +822,14 @@ class AdminPageTest extends TestCase {
 
 		$this->allowlist_mock->shouldReceive( 'get_all_patterns' )
 			->once()
-			->andReturn( [
+			->andReturn(
 				[
-					'pattern_value' => 'rocket_*',
-					'pattern_type' => 'wildcard',
-				],
-			] );
+					[
+						'pattern_value' => 'rocket_*',
+						'pattern_type'  => 'wildcard',
+					],
+				]
+			);
 
 		ob_start();
 		$this->admin_page->render_page();
@@ -834,8 +861,8 @@ class AdminPageTest extends TestCase {
 	 * @return void
 	 */
 	public function test_pattern_sanitization_strips_dangerous_characters(): void {
-		$_POST['nonce'] = 'valid-nonce';
-		$_POST['pattern'] = 'test<script>alert("xss")</script>pattern';
+		$_POST['nonce']        = 'valid-nonce';
+		$_POST['pattern']      = 'test<script>alert("xss")</script>pattern';
 		$_POST['pattern_type'] = 'exact';
 
 		Functions\expect( 'check_ajax_referer' )->andReturn( true );

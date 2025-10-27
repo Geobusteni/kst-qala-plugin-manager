@@ -50,7 +50,7 @@ class PluginActivation {
 	 * @return void
 	 */
 	public function run_database_migrations(): void {
-		// Only run migrations if needed
+		// Only run migrations if needed.
 		if ( $this->database_migration->needs_migration() ) {
 			$this->database_migration->run_migrations();
 		}

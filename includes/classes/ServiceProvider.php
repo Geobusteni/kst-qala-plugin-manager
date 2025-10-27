@@ -85,23 +85,23 @@ class ServiceProvider {
 			return $this->notice_components;
 		}
 
-		// Step 1: Run database migrations FIRST
+		// Step 1: Run database migrations FIRST.
 		$migration = new NoticeManagement\DatabaseMigration();
 		$migration->run_migrations();
 
-		// Step 2: Create components with no dependencies
+		// Step 2: Create components with no dependencies.
 		$identifier = new NoticeManagement\NoticeIdentifier();
-		$logger = new NoticeManagement\NoticeLogger();
-		$allowlist = new NoticeManagement\AllowlistManager();
+		$logger     = new NoticeManagement\NoticeLogger();
+		$allowlist  = new NoticeManagement\AllowlistManager();
 
-		// Step 3: Create components with dependencies
-		$body_class = new NoticeManagement\BodyClassManager( $allowlist );
-		$filter = new NoticeManagement\NoticeFilter( $allowlist, $logger, $identifier );
-		$admin_page = new NoticeManagement\AdminPage( $allowlist, $logger );
-		$admin_bar = new NoticeManagement\AdminBarToggle();
+		// Step 3: Create components with dependencies.
+		$body_class  = new NoticeManagement\BodyClassManager( $allowlist );
+		$filter      = new NoticeManagement\NoticeFilter( $allowlist, $logger, $identifier );
+		$admin_page  = new NoticeManagement\AdminPage( $allowlist, $logger );
+		$admin_bar   = new NoticeManagement\AdminBarToggle();
 		$site_health = new NoticeManagement\SiteHealthHider();
 
-		// Store for reuse
+		// Store for reuse.
 		$this->notice_components = [
 			$body_class,
 			$filter,

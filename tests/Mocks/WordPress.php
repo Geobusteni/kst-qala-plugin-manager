@@ -21,8 +21,8 @@ use Brain\Monkey;
  * Provides static methods for common WordPress mocking scenarios.
  * These can be used in any test to quickly set up WordPress function mocks.
  */
-class WordPress
-{
+class WordPress {
+
 	/**
 	 * Mock WordPress core constants
 	 *
@@ -31,42 +31,41 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockConstants(): void
-	{
-		if (!defined('ABSPATH')) {
-			define('ABSPATH', '/tmp/wordpress/');
+	public static function mockConstants(): void {
+		if ( ! defined( 'ABSPATH' ) ) {
+			define( 'ABSPATH', '/tmp/wordpress/' );
 		}
 
-		if (!defined('WP_CONTENT_DIR')) {
-			define('WP_CONTENT_DIR', ABSPATH . 'wp-content');
+		if ( ! defined( 'WP_CONTENT_DIR' ) ) {
+			define( 'WP_CONTENT_DIR', ABSPATH . 'wp-content' );
 		}
 
-		if (!defined('WP_PLUGIN_DIR')) {
-			define('WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins');
+		if ( ! defined( 'WP_PLUGIN_DIR' ) ) {
+			define( 'WP_PLUGIN_DIR', WP_CONTENT_DIR . '/plugins' );
 		}
 
-		if (!defined('WPMU_PLUGIN_DIR')) {
-			define('WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins');
+		if ( ! defined( 'WPMU_PLUGIN_DIR' ) ) {
+			define( 'WPMU_PLUGIN_DIR', WP_CONTENT_DIR . '/mu-plugins' );
 		}
 
-		if (!defined('WP_CONTENT_URL')) {
-			define('WP_CONTENT_URL', 'http://example.com/wp-content');
+		if ( ! defined( 'WP_CONTENT_URL' ) ) {
+			define( 'WP_CONTENT_URL', 'http://example.com/wp-content' );
 		}
 
-		if (!defined('WP_DEBUG')) {
-			define('WP_DEBUG', true);
+		if ( ! defined( 'WP_DEBUG' ) ) {
+			define( 'WP_DEBUG', true );
 		}
 
-		if (!defined('WP_DEBUG_LOG')) {
-			define('WP_DEBUG_LOG', false);
+		if ( ! defined( 'WP_DEBUG_LOG' ) ) {
+			define( 'WP_DEBUG_LOG', false );
 		}
 
-		if (!defined('WP_DEBUG_DISPLAY')) {
-			define('WP_DEBUG_DISPLAY', true);
+		if ( ! defined( 'WP_DEBUG_DISPLAY' ) ) {
+			define( 'WP_DEBUG_DISPLAY', true );
 		}
 
-		if (!defined('NONCE_SALT')) {
-			define('NONCE_SALT', 'test-nonce-salt-for-testing-only');
+		if ( ! defined( 'NONCE_SALT' ) ) {
+			define( 'NONCE_SALT', 'test-nonce-salt-for-testing-only' );
 		}
 	}
 
@@ -78,25 +77,26 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockAdminContext(): void
-	{
-		Monkey\Functions\when('is_admin')->justReturn(true);
-		Monkey\Functions\when('is_network_admin')->justReturn(false);
-		Monkey\Functions\when('is_user_admin')->justReturn(false);
+	public static function mockAdminContext(): void {
+		Monkey\Functions\when( 'is_admin' )->justReturn( true );
+		Monkey\Functions\when( 'is_network_admin' )->justReturn( false );
+		Monkey\Functions\when( 'is_user_admin' )->justReturn( false );
 
 		// Mock admin_url() to return a test URL
-		Monkey\Functions\when('admin_url')->alias(function ($path = '') {
-			return 'http://example.com/wp-admin/' . ltrim($path, '/');
-		});
+		Monkey\Functions\when( 'admin_url' )->alias(
+			function ( $path = '' ) {
+				return 'http://example.com/wp-admin/' . ltrim( $path, '/' );
+			}
+		);
 
 		// Mock current_user_can() to return true by default
-		Monkey\Functions\when('current_user_can')->justReturn(true);
+		Monkey\Functions\when( 'current_user_can' )->justReturn( true );
 
 		// Mock is_user_logged_in() to return true
-		Monkey\Functions\when('is_user_logged_in')->justReturn(true);
+		Monkey\Functions\when( 'is_user_logged_in' )->justReturn( true );
 
 		// Mock get_current_user_id() to return test user ID
-		Monkey\Functions\when('get_current_user_id')->justReturn(1);
+		Monkey\Functions\when( 'get_current_user_id' )->justReturn( 1 );
 	}
 
 	/**
@@ -107,20 +107,21 @@ class WordPress
 	 * @param bool $is_multisite Whether this is a multisite installation
 	 * @return void
 	 */
-	public static function mockMultisiteContext(bool $is_multisite = true): void
-	{
-		Monkey\Functions\when('is_multisite')->justReturn($is_multisite);
+	public static function mockMultisiteContext( bool $is_multisite = true ): void {
+		Monkey\Functions\when( 'is_multisite' )->justReturn( $is_multisite );
 
-		if ($is_multisite) {
-			Monkey\Functions\when('is_network_admin')->justReturn(false);
-			Monkey\Functions\when('is_super_admin')->justReturn(true);
-			Monkey\Functions\when('get_current_blog_id')->justReturn(1);
-			Monkey\Functions\when('get_current_network_id')->justReturn(1);
+		if ( $is_multisite ) {
+			Monkey\Functions\when( 'is_network_admin' )->justReturn( false );
+			Monkey\Functions\when( 'is_super_admin' )->justReturn( true );
+			Monkey\Functions\when( 'get_current_blog_id' )->justReturn( 1 );
+			Monkey\Functions\when( 'get_current_network_id' )->justReturn( 1 );
 
 			// Mock network_admin_url()
-			Monkey\Functions\when('network_admin_url')->alias(function ($path = '') {
-				return 'http://example.com/wp-admin/network/' . ltrim($path, '/');
-			});
+			Monkey\Functions\when( 'network_admin_url' )->alias(
+				function ( $path = '' ) {
+					return 'http://example.com/wp-admin/network/' . ltrim( $path, '/' );
+				}
+			);
 		}
 	}
 
@@ -131,39 +132,40 @@ class WordPress
 	 *
 	 * @return \Mockery\MockInterface
 	 */
-	public static function mockWpdb(): \Mockery\MockInterface
-	{
-		$wpdb = \Mockery::mock('wpdb');
+	public static function mockWpdb(): \Mockery\MockInterface {
+		$wpdb = \Mockery::mock( 'wpdb' );
 
 		// Set common properties
-		$wpdb->prefix = 'wp_';
+		$wpdb->prefix      = 'wp_';
 		$wpdb->base_prefix = 'wp_';
 
 		// Mock prepare() to return the query (simplified)
-		$wpdb->shouldReceive('prepare')->andReturnUsing(function ($query) {
-			return $query;
-		});
+		$wpdb->shouldReceive( 'prepare' )->andReturnUsing(
+			function ( $query ) {
+				return $query;
+			}
+		);
 
 		// Mock get_results() to return empty array by default
-		$wpdb->shouldReceive('get_results')->andReturn([]);
+		$wpdb->shouldReceive( 'get_results' )->andReturn( [] );
 
 		// Mock get_var() to return null by default
-		$wpdb->shouldReceive('get_var')->andReturn(null);
+		$wpdb->shouldReceive( 'get_var' )->andReturn( null );
 
 		// Mock get_row() to return null by default
-		$wpdb->shouldReceive('get_row')->andReturn(null);
+		$wpdb->shouldReceive( 'get_row' )->andReturn( null );
 
 		// Mock insert() to return 1 (rows affected)
-		$wpdb->shouldReceive('insert')->andReturn(1);
+		$wpdb->shouldReceive( 'insert' )->andReturn( 1 );
 
 		// Mock update() to return 1 (rows affected)
-		$wpdb->shouldReceive('update')->andReturn(1);
+		$wpdb->shouldReceive( 'update' )->andReturn( 1 );
 
 		// Mock delete() to return 1 (rows affected)
-		$wpdb->shouldReceive('delete')->andReturn(1);
+		$wpdb->shouldReceive( 'delete' )->andReturn( 1 );
 
 		// Mock query() to return true
-		$wpdb->shouldReceive('query')->andReturn(true);
+		$wpdb->shouldReceive( 'query' )->andReturn( true );
 
 		// Mock insert_id property
 		$wpdb->insert_id = 1;
@@ -182,38 +184,37 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockOptionsApi(): void
-	{
+	public static function mockOptionsApi(): void {
 		static $options = [];
 
 		// Mock get_option()
-		Monkey\Functions\when('get_option')->alias(
-			function ($option_name, $default = false) use (&$options) {
-				return $options[$option_name] ?? $default;
+		Monkey\Functions\when( 'get_option' )->alias(
+			function ( $option_name, $default = false ) use ( &$options ) {
+				return $options[ $option_name ] ?? $default;
 			}
 		);
 
 		// Mock update_option()
-		Monkey\Functions\when('update_option')->alias(
-			function ($option_name, $value) use (&$options) {
-				$options[$option_name] = $value;
+		Monkey\Functions\when( 'update_option' )->alias(
+			function ( $option_name, $value ) use ( &$options ) {
+				$options[ $option_name ] = $value;
 				return true;
 			}
 		);
 
 		// Mock delete_option()
-		Monkey\Functions\when('delete_option')->alias(
-			function ($option_name) use (&$options) {
-				unset($options[$option_name]);
+		Monkey\Functions\when( 'delete_option' )->alias(
+			function ( $option_name ) use ( &$options ) {
+				unset( $options[ $option_name ] );
 				return true;
 			}
 		);
 
 		// Mock add_option()
-		Monkey\Functions\when('add_option')->alias(
-			function ($option_name, $value) use (&$options) {
-				if (!isset($options[$option_name])) {
-					$options[$option_name] = $value;
+		Monkey\Functions\when( 'add_option' )->alias(
+			function ( $option_name, $value ) use ( &$options ) {
+				if ( ! isset( $options[ $option_name ] ) ) {
+					$options[ $option_name ] = $value;
 					return true;
 				}
 				return false;
@@ -229,42 +230,41 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockUserMetaApi(): void
-	{
+	public static function mockUserMetaApi(): void {
 		static $user_meta = [];
 
 		// Mock get_user_meta()
-		Monkey\Functions\when('get_user_meta')->alias(
-			function ($user_id, $meta_key = '', $single = false) use (&$user_meta) {
-				if (empty($meta_key)) {
-					return $user_meta[$user_id] ?? [];
+		Monkey\Functions\when( 'get_user_meta' )->alias(
+			function ( $user_id, $meta_key = '', $single = false ) use ( &$user_meta ) {
+				if ( empty( $meta_key ) ) {
+					return $user_meta[ $user_id ] ?? [];
 				}
 
-				$value = $user_meta[$user_id][$meta_key] ?? '';
+				$value = $user_meta[ $user_id ][ $meta_key ] ?? '';
 
-				if ($single) {
+				if ( $single ) {
 					return $value;
 				}
 
-				return [$value];
+				return [ $value ];
 			}
 		);
 
 		// Mock update_user_meta()
-		Monkey\Functions\when('update_user_meta')->alias(
-			function ($user_id, $meta_key, $meta_value) use (&$user_meta) {
-				if (!isset($user_meta[$user_id])) {
-					$user_meta[$user_id] = [];
+		Monkey\Functions\when( 'update_user_meta' )->alias(
+			function ( $user_id, $meta_key, $meta_value ) use ( &$user_meta ) {
+				if ( ! isset( $user_meta[ $user_id ] ) ) {
+					$user_meta[ $user_id ] = [];
 				}
-				$user_meta[$user_id][$meta_key] = $meta_value;
+				$user_meta[ $user_id ][ $meta_key ] = $meta_value;
 				return true;
 			}
 		);
 
 		// Mock delete_user_meta()
-		Monkey\Functions\when('delete_user_meta')->alias(
-			function ($user_id, $meta_key) use (&$user_meta) {
-				unset($user_meta[$user_id][$meta_key]);
+		Monkey\Functions\when( 'delete_user_meta' )->alias(
+			function ( $user_id, $meta_key ) use ( &$user_meta ) {
+				unset( $user_meta[ $user_id ][ $meta_key ] );
 				return true;
 			}
 		);
@@ -278,29 +278,28 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockTransientsApi(): void
-	{
+	public static function mockTransientsApi(): void {
 		static $transients = [];
 
 		// Mock get_transient()
-		Monkey\Functions\when('get_transient')->alias(
-			function ($transient_name) use (&$transients) {
-				return $transients[$transient_name] ?? false;
+		Monkey\Functions\when( 'get_transient' )->alias(
+			function ( $transient_name ) use ( &$transients ) {
+				return $transients[ $transient_name ] ?? false;
 			}
 		);
 
 		// Mock set_transient()
-		Monkey\Functions\when('set_transient')->alias(
-			function ($transient_name, $value, $expiration = 0) use (&$transients) {
-				$transients[$transient_name] = $value;
+		Monkey\Functions\when( 'set_transient' )->alias(
+			function ( $transient_name, $value, $expiration = 0 ) use ( &$transients ) {
+				$transients[ $transient_name ] = $value;
 				return true;
 			}
 		);
 
 		// Mock delete_transient()
-		Monkey\Functions\when('delete_transient')->alias(
-			function ($transient_name) use (&$transients) {
-				unset($transients[$transient_name]);
+		Monkey\Functions\when( 'delete_transient' )->alias(
+			function ( $transient_name ) use ( &$transients ) {
+				unset( $transients[ $transient_name ] );
 				return true;
 			}
 		);
@@ -314,21 +313,22 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockNonces(): void
-	{
+	public static function mockNonces(): void {
 		// Mock wp_create_nonce() to return a test nonce
-		Monkey\Functions\when('wp_create_nonce')->alias(function ($action = -1) {
-			return 'test_nonce_' . md5($action);
-		});
+		Monkey\Functions\when( 'wp_create_nonce' )->alias(
+			function ( $action = -1 ) {
+				return 'test_nonce_' . md5( $action );
+			}
+		);
 
 		// Mock wp_verify_nonce() to return true (valid nonce)
-		Monkey\Functions\when('wp_verify_nonce')->justReturn(1);
+		Monkey\Functions\when( 'wp_verify_nonce' )->justReturn( 1 );
 
 		// Mock check_admin_referer() to return true
-		Monkey\Functions\when('check_admin_referer')->justReturn(true);
+		Monkey\Functions\when( 'check_admin_referer' )->justReturn( true );
 
 		// Mock check_ajax_referer() to return true
-		Monkey\Functions\when('check_ajax_referer')->justReturn(true);
+		Monkey\Functions\when( 'check_ajax_referer' )->justReturn( true );
 	}
 
 	/**
@@ -338,22 +338,27 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockAjax(): void
-	{
+	public static function mockAjax(): void {
 		// Mock wp_send_json_success()
-		Monkey\Functions\when('wp_send_json_success')->alias(function ($data = null) {
-			throw new \Exception('wp_send_json_success: ' . json_encode($data));
-		});
+		Monkey\Functions\when( 'wp_send_json_success' )->alias(
+			function ( $data = null ) {
+				throw new \Exception( 'wp_send_json_success: ' . json_encode( $data ) );
+			}
+		);
 
 		// Mock wp_send_json_error()
-		Monkey\Functions\when('wp_send_json_error')->alias(function ($data = null) {
-			throw new \Exception('wp_send_json_error: ' . json_encode($data));
-		});
+		Monkey\Functions\when( 'wp_send_json_error' )->alias(
+			function ( $data = null ) {
+				throw new \Exception( 'wp_send_json_error: ' . json_encode( $data ) );
+			}
+		);
 
 		// Mock wp_send_json()
-		Monkey\Functions\when('wp_send_json')->alias(function ($response) {
-			throw new \Exception('wp_send_json: ' . json_encode($response));
-		});
+		Monkey\Functions\when( 'wp_send_json' )->alias(
+			function ( $response ) {
+				throw new \Exception( 'wp_send_json: ' . json_encode( $response ) );
+			}
+		);
 	}
 
 	/**
@@ -364,25 +369,26 @@ class WordPress
 	 * @param string $fixed_time A fixed timestamp for testing (optional)
 	 * @return void
 	 */
-	public static function mockDatetime(string $fixed_time = '2025-10-25 12:00:00'): void
-	{
+	public static function mockDatetime( string $fixed_time = '2025-10-25 12:00:00' ): void {
 		// Mock current_time()
-		Monkey\Functions\when('current_time')->alias(
-			function ($type, $gmt = 0) use ($fixed_time) {
-				if ($type === 'timestamp') {
-					return strtotime($fixed_time);
+		Monkey\Functions\when( 'current_time' )->alias(
+			function ( $type, $gmt = 0 ) use ( $fixed_time ) {
+				if ( $type === 'timestamp' ) {
+					return strtotime( $fixed_time );
 				}
 				return $fixed_time;
 			}
 		);
 
 		// Mock gmdate() wrapper
-		Monkey\Functions\when('gmdate')->alias(function ($format, $timestamp = null) use ($fixed_time) {
-			if ($timestamp === null) {
-				$timestamp = strtotime($fixed_time);
+		Monkey\Functions\when( 'gmdate' )->alias(
+			function ( $format, $timestamp = null ) use ( $fixed_time ) {
+				if ( $timestamp === null ) {
+					$timestamp = strtotime( $fixed_time );
+				}
+				return gmdate( $format, $timestamp );
 			}
-			return gmdate($format, $timestamp);
-		});
+		);
 	}
 
 	/**
@@ -393,26 +399,29 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockSanitization(): void
-	{
+	public static function mockSanitization(): void {
 		// Mock sanitize_text_field() - return input unchanged
-		Monkey\Functions\when('sanitize_text_field')->returnArg();
+		Monkey\Functions\when( 'sanitize_text_field' )->returnArg();
 
 		// Mock sanitize_email() - return input unchanged
-		Monkey\Functions\when('sanitize_email')->returnArg();
+		Monkey\Functions\when( 'sanitize_email' )->returnArg();
 
 		// Mock sanitize_key() - return lowercase alphanumeric
-		Monkey\Functions\when('sanitize_key')->alias(function ($key) {
-			return strtolower(preg_replace('/[^a-z0-9_\-]/', '', $key));
-		});
+		Monkey\Functions\when( 'sanitize_key' )->alias(
+			function ( $key ) {
+				return strtolower( preg_replace( '/[^a-z0-9_\-]/', '', $key ) );
+			}
+		);
 
 		// Mock sanitize_title() - return lowercase with hyphens
-		Monkey\Functions\when('sanitize_title')->alias(function ($title) {
-			return strtolower(str_replace(' ', '-', $title));
-		});
+		Monkey\Functions\when( 'sanitize_title' )->alias(
+			function ( $title ) {
+				return strtolower( str_replace( ' ', '-', $title ) );
+			}
+		);
 
 		// Mock wp_kses_post() - return input unchanged (allow all HTML in tests)
-		Monkey\Functions\when('wp_kses_post')->returnArg();
+		Monkey\Functions\when( 'wp_kses_post' )->returnArg();
 	}
 
 	/**
@@ -423,14 +432,13 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockEscaping(): void
-	{
-		Monkey\Functions\when('esc_html')->returnArg();
-		Monkey\Functions\when('esc_attr')->returnArg();
-		Monkey\Functions\when('esc_url')->returnArg();
-		Monkey\Functions\when('esc_js')->returnArg();
-		Monkey\Functions\when('esc_textarea')->returnArg();
-		Monkey\Functions\when('esc_sql')->returnArg();
+	public static function mockEscaping(): void {
+		Monkey\Functions\when( 'esc_html' )->returnArg();
+		Monkey\Functions\when( 'esc_attr' )->returnArg();
+		Monkey\Functions\when( 'esc_url' )->returnArg();
+		Monkey\Functions\when( 'esc_js' )->returnArg();
+		Monkey\Functions\when( 'esc_textarea' )->returnArg();
+		Monkey\Functions\when( 'esc_sql' )->returnArg();
 	}
 
 	/**
@@ -441,29 +449,32 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockTranslation(): void
-	{
+	public static function mockTranslation(): void {
 		// Mock __() - return the text
-		Monkey\Functions\when('__')->returnArg(1);
+		Monkey\Functions\when( '__' )->returnArg( 1 );
 
 		// Mock _e() - echo the text
-		Monkey\Functions\when('_e')->alias(function ($text) {
-			echo $text;
-		});
+		Monkey\Functions\when( '_e' )->alias(
+			function ( $text ) {
+				echo $text;
+			}
+		);
 
 		// Mock _x() - return the text
-		Monkey\Functions\when('_x')->returnArg(1);
+		Monkey\Functions\when( '_x' )->returnArg( 1 );
 
 		// Mock _n() - return singular or plural based on number
-		Monkey\Functions\when('_n')->alias(function ($single, $plural, $number) {
-			return $number === 1 ? $single : $plural;
-		});
+		Monkey\Functions\when( '_n' )->alias(
+			function ( $single, $plural, $number ) {
+				return $number === 1 ? $single : $plural;
+			}
+		);
 
 		// Mock esc_html__() - return the text
-		Monkey\Functions\when('esc_html__')->returnArg(1);
+		Monkey\Functions\when( 'esc_html__' )->returnArg( 1 );
 
 		// Mock esc_attr__() - return the text
-		Monkey\Functions\when('esc_attr__')->returnArg(1);
+		Monkey\Functions\when( 'esc_attr__' )->returnArg( 1 );
 	}
 
 	/**
@@ -474,8 +485,7 @@ class WordPress
 	 *
 	 * @return void
 	 */
-	public static function mockAll(): void
-	{
+	public static function mockAll(): void {
 		self::mockConstants();
 		self::mockEscaping();
 		self::mockTranslation();

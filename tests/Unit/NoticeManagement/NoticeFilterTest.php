@@ -76,8 +76,8 @@ class NoticeFilterTest extends TestCase {
 		parent::setUp();
 
 		// Create mocks for dependencies
-		$this->allowlist_mock = Mockery::mock( AllowlistManager::class );
-		$this->logger_mock = Mockery::mock( NoticeLogger::class );
+		$this->allowlist_mock  = Mockery::mock( AllowlistManager::class );
+		$this->logger_mock     = Mockery::mock( NoticeLogger::class );
 		$this->identifier_mock = Mockery::mock( NoticeIdentifier::class );
 
 		// Create NoticeFilter instance with mocked dependencies
@@ -94,12 +94,14 @@ class NoticeFilterTest extends TestCase {
 		$this->mockGetCurrentBlogId( 1 );
 
 		// Mock get_option for global toggle
-		Functions\when( 'get_option' )->alias( function ( $option, $default = false ) {
-			if ( $option === 'qala_notices_enabled' ) {
-				return 'yes';
+		Functions\when( 'get_option' )->alias(
+			function ( $option, $default = false ) {
+				if ( $option === 'qala_notices_enabled' ) {
+					  return 'yes';
+				}
+				return $default;
 			}
-			return $default;
-		} );
+		);
 
 		// Mock get_user_meta for per-user toggle
 		Functions\when( 'get_user_meta' )->justReturn( '' );
@@ -113,9 +115,11 @@ class NoticeFilterTest extends TestCase {
 	public function test_init_registers_in_admin_header_hook(): void {
 		Actions\expectAdded( 'in_admin_header' )
 			->once()
-			->whenHappen( function ( $callback, $priority ) {
-				$this->assertEquals( 100000, $priority, 'Priority should be 100000' );
-			} );
+			->whenHappen(
+				function ( $callback, $priority ) {
+					$this->assertEquals( 100000, $priority, 'Priority should be 100000' );
+				}
+			);
 
 		$this->filter->init();
 	}
@@ -227,15 +231,17 @@ class NoticeFilterTest extends TestCase {
 
 		// Create mock $wp_filter global with callbacks
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'test_callback_1' => [
-					'function' => 'test_callback_function',
-					'accepted_args' => 1,
+		$wp_filter                  = [];
+		$wp_filter['admin_notices'] = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'test_callback_1' => [
+						'function'      => 'test_callback_function',
+						'accepted_args' => 1,
+					],
 				],
-			],
-		] );
+			]
+		);
 
 		// Mock allowlist to NOT match
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -278,15 +284,17 @@ class NoticeFilterTest extends TestCase {
 
 		// Create mock $wp_filter global with callbacks
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'allowlisted_callback' => [
-					'function' => 'rocket_bad_deactivations',
-					'accepted_args' => 1,
+		$wp_filter                  = [];
+		$wp_filter['admin_notices'] = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'allowlisted_callback' => [
+						'function'      => 'rocket_bad_deactivations',
+						'accepted_args' => 1,
+					],
 				],
-			],
-		] );
+			]
+		);
 
 		// Mock allowlist to MATCH
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -338,14 +346,16 @@ class NoticeFilterTest extends TestCase {
 
 		$hooks = [ 'admin_notices', 'network_admin_notices', 'user_admin_notices', 'all_admin_notices' ];
 		foreach ( $hooks as $hook_name ) {
-			$wp_filter[ $hook_name ] = $this->createMockWpFilterHook( [
-				10 => [
-					'test_callback' => [
-						'function' => 'test_function_' . $hook_name,
-						'accepted_args' => 1,
+			$wp_filter[ $hook_name ] = $this->createMockWpFilterHook(
+				[
+					10 => [
+						'test_callback' => [
+							'function'      => 'test_function_' . $hook_name,
+							'accepted_args' => 1,
+						],
 					],
-				],
-			] );
+				]
+			);
 
 			// Mock allowlist to NOT match
 			$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -391,27 +401,29 @@ class NoticeFilterTest extends TestCase {
 
 		// Create mock $wp_filter with callbacks at different priorities
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			5 => [
-				'early_callback' => [
-					'function' => 'early_function',
-					'accepted_args' => 1,
+		$wp_filter                  = [];
+		$wp_filter['admin_notices'] = $this->createMockWpFilterHook(
+			[
+				5   => [
+					'early_callback' => [
+						'function'      => 'early_function',
+						'accepted_args' => 1,
+					],
 				],
-			],
-			10 => [
-				'default_callback' => [
-					'function' => 'default_function',
-					'accepted_args' => 1,
+				10  => [
+					'default_callback' => [
+						'function'      => 'default_function',
+						'accepted_args' => 1,
+					],
 				],
-			],
-			999 => [
-				'late_callback' => [
-					'function' => 'late_function',
-					'accepted_args' => 1,
+				999 => [
+					'late_callback' => [
+						'function'      => 'late_function',
+						'accepted_args' => 1,
+					],
 				],
-			],
-		] );
+			]
+		);
 
 		// Mock allowlist to NOT match any
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -419,9 +431,11 @@ class NoticeFilterTest extends TestCase {
 
 		// Mock identifier for all callbacks
 		$this->identifier_mock->shouldReceive( 'get_callback_name' )
-			->andReturnUsing( function ( $callback ) {
-				return $callback;
-			} );
+			->andReturnUsing(
+				function ( $callback ) {
+					return $callback;
+				}
+			);
 
 		// Expect logger to be called for all 3 priorities
 		$this->logger_mock->shouldReceive( 'log_removal' )
@@ -446,7 +460,7 @@ class NoticeFilterTest extends TestCase {
 
 		// Create mock $wp_filter with empty hook
 		global $wp_filter;
-		$wp_filter = [];
+		$wp_filter                  = [];
 		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [] );
 
 		// Logger should not be called for empty hook
@@ -496,15 +510,17 @@ class NoticeFilterTest extends TestCase {
 
 		// Create mock $wp_filter with closure
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'closure_callback' => [
-					'function' => $closure,
-					'accepted_args' => 1,
+		$wp_filter                  = [];
+		$wp_filter['admin_notices'] = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'closure_callback' => [
+						'function'      => $closure,
+						'accepted_args' => 1,
+					],
 				],
-			],
-		] );
+			]
+		);
 
 		// Mock allowlist to NOT match closures
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -546,20 +562,22 @@ class NoticeFilterTest extends TestCase {
 		Functions\when( 'current_user_can' )->justReturn( false );
 
 		// Create class method callback
-		$object = new \stdClass();
+		$object   = new \stdClass();
 		$callback = [ $object, 'method_name' ];
 
 		// Create mock $wp_filter with class method
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'class_callback' => [
-					'function' => $callback,
-					'accepted_args' => 1,
+		$wp_filter                  = [];
+		$wp_filter['admin_notices'] = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'class_callback' => [
+						'function'      => $callback,
+						'accepted_args' => 1,
+					],
 				],
-			],
-		] );
+			]
+		);
 
 		// Mock allowlist to NOT match
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -602,35 +620,41 @@ class NoticeFilterTest extends TestCase {
 
 		// Create mock $wp_filter with multiple callbacks
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'remove_this' => [
-					'function' => 'remove_function',
-					'accepted_args' => 1,
+		$wp_filter                  = [];
+		$wp_filter['admin_notices'] = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'remove_this'     => [
+						'function'      => 'remove_function',
+						'accepted_args' => 1,
+					],
+					'keep_this'       => [
+						'function'      => 'rocket_bad_deactivations',
+						'accepted_args' => 1,
+					],
+					'remove_this_too' => [
+						'function'      => 'another_remove_function',
+						'accepted_args' => 1,
+					],
 				],
-				'keep_this' => [
-					'function' => 'rocket_bad_deactivations',
-					'accepted_args' => 1,
-				],
-				'remove_this_too' => [
-					'function' => 'another_remove_function',
-					'accepted_args' => 1,
-				],
-			],
-		] );
+			]
+		);
 
 		// Mock allowlist - only 'rocket_bad_deactivations' matches
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
-			->andReturnUsing( function ( $callback_name ) {
-				return $callback_name === 'rocket_bad_deactivations';
-			} );
+			->andReturnUsing(
+				function ( $callback_name ) {
+					return $callback_name === 'rocket_bad_deactivations';
+				}
+			);
 
 		// Mock identifier
 		$this->identifier_mock->shouldReceive( 'get_callback_name' )
-			->andReturnUsing( function ( $callback ) {
-				return $callback;
-			} );
+			->andReturnUsing(
+				function ( $callback ) {
+					return $callback;
+				}
+			);
 
 		// Expect logger to be called for all 3 callbacks
 		$this->logger_mock->shouldReceive( 'log_removal' )
@@ -710,18 +734,31 @@ class NoticeFilterTest extends TestCase {
 	public function test_remove_notice_callbacks_removes_from_specific_hook(): void {
 		// Create mock $wp_filter with callbacks
 		global $wp_filter;
-		$wp_filter = [];
-		$wp_filter['admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'callback_1' => [ 'function' => 'test_1', 'accepted_args' => 1 ],
-				'callback_2' => [ 'function' => 'test_2', 'accepted_args' => 1 ],
-			],
-		] );
-		$wp_filter['all_admin_notices'] = $this->createMockWpFilterHook( [
-			10 => [
-				'callback_3' => [ 'function' => 'test_3', 'accepted_args' => 1 ],
-			],
-		] );
+		$wp_filter                      = [];
+		$wp_filter['admin_notices']     = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'callback_1' => [
+						'function'      => 'test_1',
+						'accepted_args' => 1,
+					],
+					'callback_2' => [
+						'function'      => 'test_2',
+						'accepted_args' => 1,
+					],
+				],
+			]
+		);
+		$wp_filter['all_admin_notices'] = $this->createMockWpFilterHook(
+			[
+				10 => [
+					'callback_3' => [
+						'function'      => 'test_3',
+						'accepted_args' => 1,
+					],
+				],
+			]
+		);
 
 		// Mock allowlist to NOT match
 		$this->allowlist_mock->shouldReceive( 'matches_allowlist' )
@@ -729,9 +766,11 @@ class NoticeFilterTest extends TestCase {
 
 		// Mock identifier
 		$this->identifier_mock->shouldReceive( 'get_callback_name' )
-			->andReturnUsing( function ( $callback ) {
-				return $callback;
-			} );
+			->andReturnUsing(
+				function ( $callback ) {
+					return $callback;
+				}
+			);
 
 		// Mock logger
 		$this->logger_mock->shouldReceive( 'log_removal' )
@@ -766,7 +805,7 @@ class NoticeFilterTest extends TestCase {
 		$callbacks = [];
 		for ( $i = 0; $i < 100; $i++ ) {
 			$callbacks[ "callback_{$i}" ] = [
-				'function' => "test_function_{$i}",
+				'function'      => "test_function_{$i}",
 				'accepted_args' => 1,
 			];
 		}
@@ -778,9 +817,11 @@ class NoticeFilterTest extends TestCase {
 
 		// Mock identifier
 		$this->identifier_mock->shouldReceive( 'get_callback_name' )
-			->andReturnUsing( function ( $callback ) {
-				return $callback;
-			} );
+			->andReturnUsing(
+				function ( $callback ) {
+					return $callback;
+				}
+			);
 
 		// Mock logger
 		$this->logger_mock->shouldReceive( 'log_removal' )
@@ -802,7 +843,7 @@ class NoticeFilterTest extends TestCase {
 	 * @return object Mock WP_Hook object
 	 */
 	private function createMockWpFilterHook( array $callbacks ): object {
-		$hook = new \stdClass();
+		$hook            = new \stdClass();
 		$hook->callbacks = $callbacks;
 		return $hook;
 	}

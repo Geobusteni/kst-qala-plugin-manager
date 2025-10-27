@@ -5,18 +5,26 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.0.4-debug] - 2025-10-27
+## [2.0.4] - 2025-10-27
 
-### Added
-- **Debug Logging** - Added temporary debug logging to investigate asset loading issue in MU plugin mode
-  - Logs plugin path detection (MU plugin vs regular plugin)
-  - Logs calculated plugin path and URL
-  - Logs asset file paths and whether they exist
-  - Logs asset URLs being enqueued
-  - Check WordPress debug.log for entries starting with "Qala Plugin Manager:"
+### Fixed
+- **Code Quality** - Fixed all PHPCS coding standard violations
+  - Added punctuation to inline comments across all classes
+  - Reversed Yoda conditions to use standard comparison order
+  - Fixed security issue: Changed `wp_redirect()` to `wp_safe_redirect()` in SiteHealthHider
+  - Added missing function namespaces in SiteHealthHider (`\remove_submenu_page`, `\wp_safe_redirect`, `\wp_doing_ajax`)
 
-### Note
-This is a debug version to diagnose asset loading issues. Not for production use.
+- **Unit Tests** - Fixed all 22 failing unit tests (262 tests now pass)
+  - Fixed NoticeFilter test expectations for global toggle logic
+  - Fixed SiteHealthHider tests with correct function mocks
+  - Fixed AdminBarToggle tests with correct UI text expectations
+  - Fixed AdminPage tests with correct method names
+
+### Changed
+- **Package Script** - Enhanced package exclusions
+  - Now excludes package-plugin.sh from release zip
+  - Composer configuration files (composer.json, composer.lock) excluded from release
+  - Cleaner production packages with only necessary runtime files
 
 ## [2.0.3] - 2025-10-27
 

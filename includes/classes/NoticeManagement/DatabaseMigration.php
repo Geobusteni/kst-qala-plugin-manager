@@ -44,7 +44,7 @@ class DatabaseMigration {
 	public function run_migrations(): void {
 		$current_version = $this->get_schema_version();
 
-		// Only run if version is outdated or not set
+		// Only run if version is outdated or not set.
 		if ( version_compare( $current_version, self::SCHEMA_VERSION, '>=' ) ) {
 			return;
 		}
@@ -54,15 +54,19 @@ class DatabaseMigration {
 			$this->create_allowlist_table();
 			$this->update_schema_version( self::SCHEMA_VERSION );
 
-			error_log( sprintf(
-				'Qala Notice Management: Database migration completed (v%s)',
-				self::SCHEMA_VERSION
-			) );
+			error_log(
+				sprintf(
+					'Qala Notice Management: Database migration completed (v%s)',
+					self::SCHEMA_VERSION
+				)
+			);
 		} catch ( \Exception $e ) {
-			error_log( sprintf(
-				'Qala Notice Management: Migration failed - %s',
-				$e->getMessage()
-			) );
+			error_log(
+				sprintf(
+					'Qala Notice Management: Migration failed - %s',
+					$e->getMessage()
+				)
+			);
 		}
 	}
 
@@ -80,10 +84,10 @@ class DatabaseMigration {
 		$table_name      = $wpdb->prefix . 'qala_hidden_notices_log';
 		$charset_collate = $wpdb->get_charset_collate();
 
-		// SQL must follow dbDelta() requirements:
-		// - Two spaces after PRIMARY KEY
-		// - Key definitions on separate lines
-		// - No newlines within field definitions
+		// SQL must follow dbDelta() requirements:.
+		// - Two spaces after PRIMARY KEY.
+		// - Key definitions on separate lines.
+		// - No newlines within field definitions.
 		$sql = "CREATE TABLE $table_name (
 			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			notice_hash varchar(32) NOT NULL COMMENT 'MD5 hash of callback name',
@@ -106,7 +110,7 @@ class DatabaseMigration {
 		$this->load_upgrade_functions();
 		dbDelta( $sql );
 
-		// Verify table was created
+		// Verify table was created.
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) !== $table_name ) {
 			throw new \Exception( "Failed to create table: $table_name" );
 		}
@@ -126,7 +130,7 @@ class DatabaseMigration {
 		$table_name      = $wpdb->prefix . 'qala_notice_allowlist';
 		$charset_collate = $wpdb->get_charset_collate();
 
-		// SQL must follow dbDelta() requirements
+		// SQL must follow dbDelta() requirements.
 		$sql = "CREATE TABLE $table_name (
 			id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 			pattern_value varchar(255) NOT NULL COMMENT 'Pattern to match (function name, regex, wildcard)',
@@ -143,7 +147,7 @@ class DatabaseMigration {
 		$this->load_upgrade_functions();
 		dbDelta( $sql );
 
-		// Verify table was created
+		// Verify table was created.
 		if ( $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) !== $table_name ) {
 			throw new \Exception( "Failed to create table: $table_name" );
 		}

@@ -64,9 +64,9 @@ class NoticeManagementIntegrationTest extends TestCase {
 		Monkey\setUp();
 
 		// Mock WordPress database
-		$this->wpdb_mock = Mockery::mock( '\wpdb' );
+		$this->wpdb_mock         = Mockery::mock( '\wpdb' );
 		$this->wpdb_mock->prefix = 'wp_';
-		$GLOBALS['wpdb'] = $this->wpdb_mock;
+		$GLOBALS['wpdb']         = $this->wpdb_mock;
 
 		// Mock WordPress core functions
 		$this->mock_wordpress_functions();
@@ -187,18 +187,22 @@ class NoticeManagementIntegrationTest extends TestCase {
 		$call_order = [];
 
 		// Mock dbDelta to track when it's called
-		Functions\when( 'dbDelta' )->alias( function() use ( &$call_order ) {
-			$call_order[] = 'dbDelta';
-			return [];
-		} );
+		Functions\when( 'dbDelta' )->alias(
+			function() use ( &$call_order ) {
+				$call_order[] = 'dbDelta';
+				return [];
+			}
+		);
 
 		// Mock get_option to track when components check options
-		Functions\when( 'get_option' )->alias( function( $option ) use ( &$call_order ) {
-			if ( $option === 'qala_notice_db_version' ) {
-				$call_order[] = 'get_schema_version';
+		Functions\when( 'get_option' )->alias(
+			function( $option ) use ( &$call_order ) {
+				if ( $option === 'qala_notice_db_version' ) {
+					  $call_order[] = 'get_schema_version';
+				}
+				return '0.0.0';
 			}
-			return '0.0.0';
-		} );
+		);
 
 		$this->wpdb_mock->shouldReceive( 'get_charset_collate' )
 			->andReturn( 'DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci' );
@@ -212,7 +216,7 @@ class NoticeManagementIntegrationTest extends TestCase {
 		$this->assertContains( 'dbDelta', $call_order );
 
 		// Find positions
-		$schema_pos = array_search( 'get_schema_version', $call_order );
+		$schema_pos  = array_search( 'get_schema_version', $call_order );
 		$dbdelta_pos = array_search( 'dbDelta', $call_order );
 
 		// Schema check should happen before dbDelta
@@ -236,7 +240,7 @@ class NoticeManagementIntegrationTest extends TestCase {
 
 		// Test class method callback
 		$callback = [ $this, 'dummy_callback' ];
-		$hash3 = $identifier->generate_callback_hash( $callback, 'admin_notices' );
+		$hash3    = $identifier->generate_callback_hash( $callback, 'admin_notices' );
 		$this->assertEquals( 32, strlen( $hash3 ) );
 
 		// Different hooks should generate different hashes
@@ -298,9 +302,14 @@ class NoticeManagementIntegrationTest extends TestCase {
 			->once()
 			->andReturn( 1 );
 		$this->wpdb_mock->shouldReceive( 'get_results' )
-			->andReturn( [
-				(object) [ 'pattern_value' => 'rocket_*', 'pattern_type' => 'wildcard' ],
-			] );
+			->andReturn(
+				[
+					(object) [
+						'pattern_value' => 'rocket_*',
+						'pattern_type'  => 'wildcard',
+					],
+				]
+			);
 
 		// Mock transient functions
 		Functions\when( 'get_transient' )->justReturn( false );
@@ -330,9 +339,11 @@ class NoticeManagementIntegrationTest extends TestCase {
 	public function test_notice_logger_logs_notices(): void {
 		// Mock database insert
 		$this->wpdb_mock->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query, ...$args ) {
-				return vsprintf( str_replace( '%s', "'%s'", str_replace( '%d', '%d', $query ) ), $args );
-			} );
+			->andReturnUsing(
+				function( $query, ...$args ) {
+					return vsprintf( str_replace( '%s', "'%s'", str_replace( '%d', '%d', $query ) ), $args );
+				}
+			);
 		$this->wpdb_mock->shouldReceive( 'get_var' )
 			->andReturn( null ); // No existing log
 		$this->wpdb_mock->shouldReceive( 'insert' )
@@ -371,20 +382,27 @@ class NoticeManagementIntegrationTest extends TestCase {
 		$this->wpdb_mock->shouldReceive( 'get_var' )
 			->andReturn( 'wp_qala_hidden_notices_log', 'wp_qala_notice_allowlist', null );
 		$this->wpdb_mock->shouldReceive( 'prepare' )
-			->andReturnUsing( function( $query, ...$args ) {
-				return vsprintf( str_replace( '%s', "'%s'", str_replace( '%d', '%d', $query ) ), $args );
-			} );
+			->andReturnUsing(
+				function( $query, ...$args ) {
+					return vsprintf( str_replace( '%s', "'%s'", str_replace( '%d', '%d', $query ) ), $args );
+				}
+			);
 		$this->wpdb_mock->shouldReceive( 'insert' )
 			->andReturn( 1 );
 		$this->wpdb_mock->shouldReceive( 'get_results' )
-			->andReturn( [
-				(object) [ 'pattern_value' => 'rocket_*', 'pattern_type' => 'wildcard' ],
-			] );
+			->andReturn(
+				[
+					(object) [
+						'pattern_value' => 'rocket_*',
+						'pattern_type'  => 'wildcard',
+					],
+				]
+			);
 
 		// Step 1: Create components
 		$identifier = new NoticeIdentifier();
-		$logger = new NoticeLogger();
-		$allowlist = new AllowlistManager();
+		$logger     = new NoticeLogger();
+		$allowlist  = new AllowlistManager();
 
 		// Step 2: Add pattern to allowlist
 		$allowlist->add_pattern( 'rocket_*', 'wildcard' );
@@ -442,23 +460,31 @@ class NoticeManagementIntegrationTest extends TestCase {
 	public function test_hooks_registered_on_init(): void {
 		// Track add_action calls
 		$hooks_registered = [];
-		Functions\when( 'add_action' )->alias( function( $hook, $callback, $priority = 10 ) use ( &$hooks_registered ) {
-			$hooks_registered[] = [ 'hook' => $hook, 'priority' => $priority ];
-			return true;
-		} );
+		Functions\when( 'add_action' )->alias(
+			function( $hook, $callback, $priority = 10 ) use ( &$hooks_registered ) {
+				$hooks_registered[] = [
+					'hook'     => $hook,
+					'priority' => $priority,
+				];
+				return true;
+			}
+		);
 
 		// Create NoticeFilter with dependencies
 		$identifier = new NoticeIdentifier();
-		$logger = new NoticeLogger();
-		$allowlist = new AllowlistManager();
-		$filter = new NoticeFilter( $allowlist, $logger, $identifier );
+		$logger     = new NoticeLogger();
+		$allowlist  = new AllowlistManager();
+		$filter     = new NoticeFilter( $allowlist, $logger, $identifier );
 
 		// Call init
 		$filter->init();
 
 		// Verify in_admin_header hook was registered at priority 100000
 		$this->assertContains(
-			[ 'hook' => 'in_admin_header', 'priority' => 100000 ],
+			[
+				'hook'     => 'in_admin_header',
+				'priority' => 100000,
+			],
 			$hooks_registered,
 			'NoticeFilter should register in_admin_header hook at priority 100000'
 		);
