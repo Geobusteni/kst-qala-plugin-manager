@@ -5,6 +5,19 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4-debug] - 2025-10-27
+
+### Added
+- **Debug Logging** - Added temporary debug logging to investigate asset loading issue in MU plugin mode
+  - Logs plugin path detection (MU plugin vs regular plugin)
+  - Logs calculated plugin path and URL
+  - Logs asset file paths and whether they exist
+  - Logs asset URLs being enqueued
+  - Check WordPress debug.log for entries starting with "Qala Plugin Manager:"
+
+### Note
+This is a debug version to diagnose asset loading issues. Not for production use.
+
 ## [2.0.3] - 2025-10-27
 
 ### Fixed

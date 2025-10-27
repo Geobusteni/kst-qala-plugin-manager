@@ -80,10 +80,18 @@ class Plugin {
 				untrailingslashit( site_url() ),
 				$plugin_file
 			);
+			// Debug logging
+			error_log( 'Qala Plugin Manager: Detected MU plugin' );
+			error_log( 'Plugin path: ' . self::$plugin_path );
+			error_log( 'Plugin URL: ' . self::$plugin_url );
 		} else {
 			// Running as regular plugin
 			self::$plugin_url  = dirname( dirname( untrailingslashit( plugins_url( '/', __FILE__ ) ) ) );
 			self::$plugin_path = dirname( dirname( untrailingslashit( plugin_dir_path( __FILE__ ) ) ) );
+			// Debug logging
+			error_log( 'Qala Plugin Manager: Detected regular plugin' );
+			error_log( 'Plugin path: ' . self::$plugin_path );
+			error_log( 'Plugin URL: ' . self::$plugin_url );
 		}
 
 		self::$plugin_template_path = trailingslashit( self::$plugin_path ) . 'views';
