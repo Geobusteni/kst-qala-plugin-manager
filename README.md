@@ -315,16 +315,19 @@ The plugin hooks into `in_admin_header` at priority 100000 (latest possible timi
 
 ## Development
 
-For detailed developer instructions, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+For detailed developer instructions, see **[CONTRIBUTING.md](CONTRIBUTING.md)** and **[CHANGES.md](CHANGES.md)** for modifications from the original plugin.
 
 ### Quick Start
 
 ```bash
-# Install dependencies
+# Install PHP dependencies
 composer install
 
-# Build assets
-./build-assets.sh
+# Install npm dependencies
+npm install
+
+# Build assets for production
+npm run build
 
 # Run tests
 composer test
@@ -333,6 +336,12 @@ composer test
 ### Common Tasks
 
 ```bash
+# Development with hot reload
+npm start
+
+# Build for production
+npm run build
+
 # Check code style
 composer style:check
 
@@ -348,15 +357,32 @@ composer test:unit
 
 ### Building Assets
 
-The plugin uses a custom build script (no npm required):
+The plugin uses **@wordpress/scripts** (webpack + PostCSS):
 
 ```bash
-./build-assets.sh
+# Production build (minified, optimized)
+npm run build
+
+# Development build (source maps, hot reload)
+npm start
 ```
 
-This processes all CSS and JavaScript files from `assets/` into `assets/dist/`.
+**Output**:
+- `assets/dist/qala-plugin-manager.css` - Bundled CSS
+- `assets/dist/qala-plugin-manager-rtl.css` - RTL stylesheet (auto-generated)
+- `assets/dist/js/qala-plugin-manager.js` - Bundled & minified JavaScript
 
-**Important**: Always run the build script after editing JS or CSS files.
+**Important**: Always run `npm run build` before committing asset changes.
+
+### Creating Releases
+
+```bash
+# Build assets
+npm run build
+
+# Create release zip
+./package-plugin.sh
+```
 
 ### Code Standards
 

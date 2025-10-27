@@ -18,6 +18,8 @@ This guide provides detailed instructions for developers working on the Qala Plu
 
 - **PHP**: 7.3 or higher
 - **Composer**: Latest version
+- **Node.js**: 14.0 or higher
+- **npm**: Latest version (comes with Node.js)
 - **Git**: For version control
 - **WordPress**: 6.4+ for testing
 
@@ -47,14 +49,31 @@ This installs development tools:
 - PHPUnit (unit testing)
 - GrumPHP (pre-commit hooks)
 
-3. **Verify Installation**
+3. **Install npm Dependencies**
+
+```bash
+npm install
+```
+
+This installs build tools:
+- @wordpress/scripts (webpack, babel, postcss)
+- Asset bundling and minification
+- Development server with hot reload
+
+4. **Verify Installation**
 
 ```bash
 # Check PHP version
 php -v
 
+# Check Node version
+node -v
+
 # Check composer dependencies
 composer show
+
+# Build assets
+npm run build
 
 # Run tests to verify setup
 composer test
@@ -68,33 +87,41 @@ Database tables are created automatically when the plugin loads in WordPress. No
 
 ### Understanding the Build Process
 
-The plugin uses a custom bash script to process assets:
+The plugin uses **@wordpress/scripts** for modern asset bundling:
 
 - **Source Files** (edit these):
-  - `assets/js/qala-plugin-manager.js` - Main JavaScript file
-  - `assets/js/admin-page.js` - Admin page specific JS
-  - `assets/js/admin-bar-toggle.js` - Admin bar toggle JS
-  - `assets/css/*.css` - All CSS files
+  - `assets/src/js/index.js` - JavaScript entry point
+  - `assets/src/css/*.css` - CSS source files
+  - `assets/js/qala-plugin-manager.js` - Main JavaScript (imported by index.js)
 
-- **Dist Files** (generated, don't edit):
-  - `assets/dist/js/*.js` - Processed JavaScript
-  - `assets/dist/css/*.css` - Processed CSS
+- **Build Output** (generated, don't edit):
+  - `assets/dist/qala-plugin-manager.css` - Bundled CSS
+  - `assets/dist/qala-plugin-manager-rtl.css` - RTL stylesheet (auto-generated)
+  - `assets/dist/js/qala-plugin-manager.js` - Bundled & minified JavaScript
+  - `assets/dist/js/qala-plugin-manager.asset.php` - Dependency file
 
 ### Building Assets
 
-Run the build script from the plugin root directory:
+**Production Build** (minified, optimized):
 
 ```bash
-./build-assets.sh
+npm run build
 ```
 
-This script:
-1. Creates `assets/dist/` directories
-2. Adds version headers to files
-3. Minifies CSS and JavaScript
-4. Outputs summary of generated files
+**Development Build** (with hot reload):
 
-**Note**: Always run this before committing asset changes!
+```bash
+npm start
+```
+
+The build process:
+1. Bundles all CSS into one file
+2. Generates RTL stylesheet automatically
+3. Bundles and minifies JavaScript
+4. Creates dependency file for WordPress
+5. Optimizes assets for production
+
+**Note**: Always run `npm run build` before committing asset changes!
 
 ## Making Changes
 
@@ -123,7 +150,11 @@ This script:
 1. **Make Changes** to source files (PHP, JS, CSS)
 2. **Build Assets** if you changed JS/CSS:
    ```bash
-   ./build-assets.sh
+   npm run build
+   ```
+   Or use development mode with hot reload:
+   ```bash
+   npm start
    ```
 3. **Test Locally** in WordPress installation
 4. **Run Tests**:
@@ -199,10 +230,10 @@ Add new version section at the top:
 #### 3. Build Assets
 
 ```bash
-./build-assets.sh
+npm run build
 ```
 
-Verify output shows all files processed successfully.
+Verify output shows all files bundled successfully.
 
 #### 4. Run Tests
 
@@ -246,23 +277,20 @@ git push origin v1.0.X
 
 #### 8. Create Release Package (ZIP)
 
-From the `sources/qala-manager` directory:
+Use the package script:
 
 ```bash
-zip -r qala-plugin-manager-v1.0.X.zip qala-plugin-manager \
-  -x "*/node_modules/*" \
-  -x "*/vendor/bin/*" \
-  -x "*/tests/*" \
-  -x "*/.git/*" \
-  -x "*/.github/*" \
-  -x "*/.gitlab/*" \
-  -x "*/phpunit.xml" \
-  -x "*/composer.lock" \
-  -x "*/package-lock.json" \
-  -x "*/.DS_Store"
+./package-plugin.sh
 ```
 
-This creates an installation-ready zip file.
+This script:
+- Verifies assets are built
+- Creates zip with proper exclusions
+- Excludes source files (assets/src/*, node_modules, etc.)
+- Includes only production-ready files
+- Names file: `qala-plugin-manager-vX.X.X.zip`
+
+Output location: `../qala-plugin-manager-vX.X.X.zip`
 
 #### 9. Create Platform Release
 
@@ -371,14 +399,21 @@ composer test:phpstan
 qala-plugin-manager/
 ├── index.php                  # Main plugin file
 ├── composer.json              # PHP dependencies
-├── build-assets.sh           # Build script
+├── package.json               # NPM dependencies & build scripts
+├── webpack.config.js          # Webpack configuration
+├── postcss.config.js          # PostCSS configuration
+├── package-plugin.sh          # Release packaging script
 ├── CHANGELOG.md              # Version history
 ├── README.md                 # User documentation
 ├── CONTRIBUTING.md           # This file
+├── CHANGES.md                # Detailed comparison from v1.x
 ├── assets/
-│   ├── js/                   # Source JavaScript
-│   ├── css/                  # Source CSS
-│   └── dist/                 # Built assets (generated)
+│   ├── src/                  # Source files for webpack
+│   │   ├── js/              # Source JavaScript
+│   │   └── css/             # Source CSS
+│   ├── js/                   # Legacy JavaScript (imported by webpack)
+│   ├── css/                  # Legacy CSS (imported by webpack)
+│   └── dist/                 # Built assets (generated by webpack)
 ├── includes/
 │   └── classes/              # PHP classes (PSR-4)
 │       ├── NoticeManagement/ # Notice hiding features
@@ -389,20 +424,23 @@ qala-plugin-manager/
 │   ├── grumphp/             # GrumPHP config
 │   └── scripts/             # Build scripts
 ├── languages/                # Translation files
-└── tests/                    # PHPUnit tests
+├── tests/                    # PHPUnit tests
+└── node_modules/             # NPM packages (generated)
 
 ```
 
 ## Troubleshooting
 
-### Build Script Fails
+### Build Fails
 
-**Problem**: `build-assets.sh` errors or doesn't work
+**Problem**: `npm run build` errors or doesn't work
 
 **Solutions**:
-1. Make script executable: `chmod +x build-assets.sh`
+1. Ensure npm dependencies are installed: `npm install`
 2. Run from plugin root directory
-3. Check bash is available: `which bash`
+3. Check Node.js version: `node -v` (requires Node 14+)
+4. Clear npm cache: `npm cache clean --force`
+5. Remove node_modules and reinstall: `rm -rf node_modules && npm install`
 
 ### Tests Fail
 

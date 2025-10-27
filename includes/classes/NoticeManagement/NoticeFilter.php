@@ -82,9 +82,9 @@ class NoticeFilter implements WithHooksInterface {
 	 *
 	 * Hook Registration:
 	 * - in_admin_header @ priority 100000: Remove notice hooks before they fire
-	 * - admin_enqueue_scripts @ priority 1: Enqueue combined CSS (always loads)
 	 *
-	 * The CSS approach provides a bulletproof fallback for notices that bypass
+	 * Note: Assets (CSS/JS) are now bundled and enqueued by AdminBarToggle.
+	 * The CSS provides a bulletproof fallback for notices that bypass
 	 * the hook system (e.g., WooCommerce HTTPS notice, AJAX notices).
 	 *
 	 * @return void
@@ -92,9 +92,6 @@ class NoticeFilter implements WithHooksInterface {
 	public function init(): void {
 		// Main hook: Filter notices at latest possible moment before they render
 		add_action( 'in_admin_header', [ $this, 'filter_notices' ], 100000 );
-
-		// Enqueue combined CSS at highest priority (always loads)
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ], 1 );
 	}
 
 	/**
@@ -334,16 +331,4 @@ class NoticeFilter implements WithHooksInterface {
 	 *
 	 * @return void
 	 */
-	public function enqueue_assets(): void {
-		$css_path = \QalaPluginManager\Plugin::get_path() . '/assets/dist/css/qala-plugin-manager.css';
-		$css_url = \QalaPluginManager\Plugin::get_url() . '/assets/dist/css/qala-plugin-manager.css';
-
-		wp_enqueue_style(
-			'qala-plugin-manager',
-			$css_url,
-			[],
-			file_exists( $css_path ) ? filemtime( $css_path ) : '1.0.3'
-		);
-	}
-
 }

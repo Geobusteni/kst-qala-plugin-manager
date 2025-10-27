@@ -1,0 +1,32 @@
+{
+  "name": "qala-plugin-manager",
+  "version": "2.0.0",
+  "description": "WordPress must-use plugin for plugin management and admin notice control",
+  "author": "Angry Creative AB",
+  "license": "GPL-2.0-or-later",
+  "keywords": [
+    "wordpress",
+    "plugin",
+    "admin",
+    "notices"
+  ],
+  "homepage": "https://angrycreative.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Geobusteni/kst-qala-plugin-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Geobusteni/kst-qala-plugin-manager/issues"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "start": "wp-scripts start",
+    "lint:js": "wp-scripts lint-js",
+    "lint:css": "wp-scripts lint-style",
+    "format:js": "wp-scripts format",
+    "check-licenses": "wp-scripts check-licenses"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^27.0.0"
+  }
+}
