@@ -5,6 +5,36 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.5] - 2025-10-27
+
+### Changed - BREAKING
+- **Modern Build System**: Migrated from bash-based build to @wordpress/scripts (webpack + PostCSS)
+  - Assets now built with `npm run build` instead of `./build-assets.sh`
+  - CSS bundled into single `qala-plugin-manager.css` file (with RTL version)
+  - JavaScript bundled into single `qala-plugin-manager.js` file
+  - Automatic RTL stylesheet generation
+  - Minification and optimization built-in
+
+### Added
+- **package.json**: npm configuration with @wordpress/scripts
+- **webpack.config.js**: Webpack configuration for bundling
+- **postcss.config.js**: PostCSS configuration
+- **assets/src/**: Source files for bundling (js/index.js, css files)
+
+### Removed
+- **build-assets.sh**: Replaced by `npm run build`
+
+### Technical Details
+- No functional changes to plugin behavior
+- All features from v1.0.11 preserved
+- Asset output format matches v1.x (single JS and CSS files)
+- Compatible with both regular plugins and MU plugins
+
+### Migration from v1.x
+- Direct upgrade - no configuration changes needed
+- All settings and data preserved
+- Assets automatically rebuilt with new build system
+
 ## [1.0.11] - 2025-10-26
 
 ### Added

@@ -60,10 +60,6 @@
            but we may use them in non-VIP environments -->
       <exclude name="WordPress.VIP.SessionFunctionsUsage.session_session_start"/>
 
-      <!-- WordPress.VIP.FileSystemWritesDisallow: VIP doesn't allow filesystem writes,
-           but we're not on VIP platform -->
-      <exclude name="WordPress.VIP.FileSystemWritesDisallow"/>
-
       <!-- WordPress.VIP.AdminBarRemoval: VIP doesn't allow removing admin bar,
            but this may be needed for specific use cases -->
       <exclude name="WordPress.VIP.AdminBarRemoval.RemovalDetected"/>
