@@ -1,7 +1,7 @@
 /**
  * Qala Plugin Manager - admin-page.js
- * Version: 1.0.0
- * Built: 2025-10-26 20:08:36
+ * Version: 1.0.11
+ * Built: 2025-10-27 09:33:46
  */
 /**
 * Qala Admin Page JavaScript

@@ -2,25 +2,35 @@
 # Build script for Qala Plugin Manager assets
 # Processes CSS and JS files for production deployment
 
-PLUGIN_DIR="/root/gits/kst-qala-plugin-manager/sources/qala-manager/qala-plugin-manager"
+# Get the directory where this script is located
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PLUGIN_DIR="$SCRIPT_DIR"
 ASSETS_DIR="$PLUGIN_DIR/assets"
 DIST_DIR="$ASSETS_DIR/dist"
 
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 echo -e "${BLUE}Building Qala Plugin Manager assets...${NC}"
+echo -e "${BLUE}Plugin directory: ${PLUGIN_DIR}${NC}"
 
 # Create dist directories
 mkdir -p "$DIST_DIR/css"
 mkdir -p "$DIST_DIR/js"
 
-# Get version from plugin main file
-VERSION=$(grep "Version:" "$PLUGIN_DIR/qala-plugin-manager.php" | head -1 | awk '{print $3}')
+# Get version from plugin main file (try index.php first, then qala-plugin-manager.php)
+if [ -f "$PLUGIN_DIR/index.php" ]; then
+    VERSION=$(grep "Version:" "$PLUGIN_DIR/index.php" | head -1 | awk '{print $3}')
+elif [ -f "$PLUGIN_DIR/qala-plugin-manager.php" ]; then
+    VERSION=$(grep "Version:" "$PLUGIN_DIR/qala-plugin-manager.php" | head -1 | awk '{print $3}')
+fi
+
 if [ -z "$VERSION" ]; then
     VERSION="1.0.0"
+    echo -e "${RED}Warning: Could not detect version, using default: ${VERSION}${NC}"
 fi
 
 echo -e "${BLUE}Plugin version: ${VERSION}${NC}"
@@ -84,6 +94,7 @@ minify_css "$ASSETS_DIR/css/admin-bar-toggle.css" "$DIST_DIR/css/admin-bar-toggl
 
 # Process JS files
 echo -e "\n${BLUE}Processing JS files...${NC}"
+minify_js "$ASSETS_DIR/js/qala-plugin-manager.js" "$DIST_DIR/js/qala-plugin-manager.js"
 minify_js "$ASSETS_DIR/js/admin-page.js" "$DIST_DIR/js/admin-page.js"
 minify_js "$ASSETS_DIR/js/admin-bar-toggle.js" "$DIST_DIR/js/admin-bar-toggle.js"
 

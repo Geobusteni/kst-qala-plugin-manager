@@ -315,53 +315,58 @@ The plugin hooks into `in_admin_header` at priority 100000 (latest possible timi
 
 ## Development
 
-### Running Tests
+For detailed developer instructions, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
+
+### Quick Start
 
 ```bash
 # Install dependencies
 composer install
 
-# Run all tests
+# Build assets
+./build-assets.sh
+
+# Run tests
 composer test
+```
 
-# Run unit tests only
-composer test:unit
+### Common Tasks
 
-# Run PHPStan
-composer test:phpstan
-
-# Run PHPCS
+```bash
+# Check code style
 composer style:check
 
-# Fix code style
+# Fix code style automatically
 composer style:fix
+
+# Run static analysis
+composer test:phpstan
+
+# Run unit tests
+composer test:unit
 ```
 
 ### Building Assets
 
+The plugin uses a custom build script (no npm required):
+
 ```bash
-# Install npm dependencies
-npm install
-
-# Build for production
-npm run build
-
-# Build for development (with source maps)
-npm run dev
-
-# Watch for changes
-npm run watch
+./build-assets.sh
 ```
+
+This processes all CSS and JavaScript files from `assets/` into `assets/dist/`.
+
+**Important**: Always run the build script after editing JS or CSS files.
 
 ### Code Standards
 
-- WordPress Extra coding standards
-- WordPress VIP Go standards
-- No Yoda conditions
-- Short array syntax `[]`
+- WordPress Extra + VIP Go coding standards
 - PSR-4 autoloading
+- PHP 7.3+ type hints
 - Comprehensive PHPDoc blocks
-- Type hints (PHP 7.3+)
+- PHPStan level 8 compliance
+
+For complete development workflow, testing, and release instructions, see **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ## Support
 
