@@ -59,9 +59,9 @@ fi
 echo -e "\n${BLUE}Creating zip package...${NC}"
 cd "$PARENT_DIR"
 
+# Exclude vendor packages but keep composer autoloader
 zip -r "$OUTPUT_FILE" qala-plugin-manager \
   -x "*/node_modules/*" \
-  -x "*/dependencies/vendor/*/*" \
   -x "*/tests/*" \
   -x "*/.git/*" \
   -x "*/.github/*" \
@@ -77,6 +77,39 @@ zip -r "$OUTPUT_FILE" qala-plugin-manager \
   -x "*/postcss.config.js" \
   -x "*/.gitignore" \
   -x "*/build-assets.sh" \
+  -x "*/dependencies/vendor/amphp/*" \
+  -x "*/dependencies/vendor/antecedent/*" \
+  -x "*/dependencies/vendor/automattic/*" \
+  -x "*/dependencies/vendor/bin/*" \
+  -x "*/dependencies/vendor/brain/*" \
+  -x "*/dependencies/vendor/dealerdirect/*" \
+  -x "*/dependencies/vendor/doctrine/*" \
+  -x "*/dependencies/vendor/gitonomy/*" \
+  -x "*/dependencies/vendor/hamcrest/*" \
+  -x "*/dependencies/vendor/mockery/*" \
+  -x "*/dependencies/vendor/monolog/*" \
+  -x "*/dependencies/vendor/myclabs/*" \
+  -x "*/dependencies/vendor/nikic/*" \
+  -x "*/dependencies/vendor/ondram/*" \
+  -x "*/dependencies/vendor/opis/*" \
+  -x "*/dependencies/vendor/phar-io/*" \
+  -x "*/dependencies/vendor/php-stubs/*" \
+  -x "*/dependencies/vendor/phpcompatibility/*" \
+  -x "*/dependencies/vendor/phpdocumentor/*" \
+  -x "*/dependencies/vendor/phpro/*" \
+  -x "*/dependencies/vendor/phpstan/*" \
+  -x "*/dependencies/vendor/phpunit/*" \
+  -x "*/dependencies/vendor/pronamic/*" \
+  -x "*/dependencies/vendor/psr/*" \
+  -x "*/dependencies/vendor/sebastian/*" \
+  -x "*/dependencies/vendor/seld/*" \
+  -x "*/dependencies/vendor/sirbrillig/*" \
+  -x "*/dependencies/vendor/squizlabs/*" \
+  -x "*/dependencies/vendor/symfony/*" \
+  -x "*/dependencies/vendor/szepeviktor/*" \
+  -x "*/dependencies/vendor/theseer/*" \
+  -x "*/dependencies/vendor/webmozart/*" \
+  -x "*/dependencies/vendor/wp-coding-standards/*" \
   > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then

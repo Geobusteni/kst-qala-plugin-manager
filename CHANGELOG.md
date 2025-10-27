@@ -5,6 +5,30 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.2] - 2025-10-27
+
+### Fixed
+- **Composer Autoloader** - Fixed package script to include composer autoloader files
+  - Previously excluded all vendor files including composer/ directory
+  - Now includes `vendor/autoload.php` and `vendor/composer/` directory
+  - Fixes autoloading issues when installing from release zip
+  - Package size increased slightly to 167KB (from 104KB) due to autoloader inclusion
+
+### Changed
+- **Package Script** - Updated vendor exclusion logic
+  - Changed from broad `"*/dependencies/vendor/*/*"` exclusion
+  - Now explicitly excludes dev dependencies (PHPStan, PHPCS, PHPUnit, etc.)
+  - Keeps composer autoloader files which are required for runtime
+
+- **PHPCS Configuration** - Removed non-existent sniff reference
+  - Removed `WordPress.VIP.FileSystemWritesDisallow` exclusion (sniff no longer exists)
+  - Fixes PHPCS configuration error
+
+### Technical Details
+- Package now includes 15 composer autoloader files (~55KB)
+- All vendor packages (dev dependencies) still excluded
+- Plugin autoloading works correctly from release zip
+
 ## [2.0.1] - 2025-10-27
 
 ### Fixed
