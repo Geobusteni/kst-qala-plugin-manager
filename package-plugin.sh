@@ -45,6 +45,16 @@ fi
 
 echo -e "${GREEN}✓ Assets verified${NC}"
 
+# Regenerate composer autoloader without dev dependencies
+echo -e "\n${BLUE}Regenerating composer autoloader (production only)...${NC}"
+cd "$PLUGIN_DIR"
+COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction > /dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo -e "${RED}Error: Failed to regenerate composer autoloader${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Autoloader regenerated${NC}"
+
 # Define output filename
 OUTPUT_FILE="qala-plugin-manager-v${VERSION}.zip"
 OUTPUT_PATH="$PARENT_DIR/$OUTPUT_FILE"
@@ -56,10 +66,10 @@ if [ -f "$OUTPUT_PATH" ]; then
 fi
 
 # Create zip file
+# Note: composer autoloader already regenerated with --no-dev, so vendor only contains production dependencies
 echo -e "\n${BLUE}Creating zip package...${NC}"
 cd "$PARENT_DIR"
 
-# Exclude vendor packages but keep composer autoloader
 zip -r "$OUTPUT_FILE" qala-plugin-manager \
   -x "*/node_modules/*" \
   -x "*/tests/*" \
@@ -67,7 +77,13 @@ zip -r "$OUTPUT_FILE" qala-plugin-manager \
   -x "*/.github/*" \
   -x "*/.gitlab/*" \
   -x "*/phpunit.xml" \
+  -x "*/phpunit.xml.dist" \
+  -x "*/phpstan.neon" \
+  -x "*/phpstan.neon.dist" \
+  -x "*/phpcs.xml" \
+  -x "*/composer.json" \
   -x "*/composer.lock" \
+  -x "*/package.json" \
   -x "*/package-lock.json" \
   -x "*/.DS_Store" \
   -x "*/assets/src/*" \
@@ -77,39 +93,8 @@ zip -r "$OUTPUT_FILE" qala-plugin-manager \
   -x "*/postcss.config.js" \
   -x "*/.gitignore" \
   -x "*/build-assets.sh" \
-  -x "*/dependencies/vendor/amphp/*" \
-  -x "*/dependencies/vendor/antecedent/*" \
-  -x "*/dependencies/vendor/automattic/*" \
-  -x "*/dependencies/vendor/bin/*" \
-  -x "*/dependencies/vendor/brain/*" \
-  -x "*/dependencies/vendor/dealerdirect/*" \
-  -x "*/dependencies/vendor/doctrine/*" \
-  -x "*/dependencies/vendor/gitonomy/*" \
-  -x "*/dependencies/vendor/hamcrest/*" \
-  -x "*/dependencies/vendor/mockery/*" \
-  -x "*/dependencies/vendor/monolog/*" \
-  -x "*/dependencies/vendor/myclabs/*" \
-  -x "*/dependencies/vendor/nikic/*" \
-  -x "*/dependencies/vendor/ondram/*" \
-  -x "*/dependencies/vendor/opis/*" \
-  -x "*/dependencies/vendor/phar-io/*" \
-  -x "*/dependencies/vendor/php-stubs/*" \
-  -x "*/dependencies/vendor/phpcompatibility/*" \
-  -x "*/dependencies/vendor/phpdocumentor/*" \
-  -x "*/dependencies/vendor/phpro/*" \
-  -x "*/dependencies/vendor/phpstan/*" \
-  -x "*/dependencies/vendor/phpunit/*" \
-  -x "*/dependencies/vendor/pronamic/*" \
-  -x "*/dependencies/vendor/psr/*" \
-  -x "*/dependencies/vendor/sebastian/*" \
-  -x "*/dependencies/vendor/seld/*" \
-  -x "*/dependencies/vendor/sirbrillig/*" \
-  -x "*/dependencies/vendor/squizlabs/*" \
-  -x "*/dependencies/vendor/symfony/*" \
-  -x "*/dependencies/vendor/szepeviktor/*" \
-  -x "*/dependencies/vendor/theseer/*" \
-  -x "*/dependencies/vendor/webmozart/*" \
-  -x "*/dependencies/vendor/wp-coding-standards/*" \
+  -x "*/dependencies/grumphp/*" \
+  -x "*/dependencies/scripts/*" \
   > /dev/null 2>&1
 
 if [ $? -eq 0 ]; then
@@ -123,5 +108,22 @@ if [ $? -eq 0 ]; then
     echo -e "${BLUE}Location: ${OUTPUT_PATH}${NC}"
 else
     echo -e "${RED}Error creating package${NC}"
+
+    # Restore dev dependencies before exiting
+    cd "$PLUGIN_DIR"
+    echo -e "\n${YELLOW}Restoring dev dependencies...${NC}"
+    COMPOSER_ALLOW_SUPERUSER=1 composer install > /dev/null 2>&1
+
     exit 1
+fi
+
+# Restore dev dependencies for development
+echo -e "\n${BLUE}Restoring dev dependencies for development...${NC}"
+cd "$PLUGIN_DIR"
+COMPOSER_ALLOW_SUPERUSER=1 composer install > /dev/null 2>&1
+if [ $? -eq 0 ]; then
+    echo -e "${GREEN}✓ Dev dependencies restored${NC}"
+else
+    echo -e "${YELLOW}Warning: Failed to restore dev dependencies${NC}"
+    echo -e "${YELLOW}Run 'composer install' manually to restore dev tools${NC}"
 fi

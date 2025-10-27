@@ -5,6 +5,34 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2025-10-27
+
+### Fixed
+- **Fatal Error on Plugin Load** - Fixed composer autoloader fatal error
+  - **Critical Fix**: v2.0.2 threw fatal error when loading: "Failed opening required amphp/amp/lib/functions.php"
+  - Root cause: Autoloader referenced dev dependencies but those packages were excluded from zip
+  - Solution: Regenerate composer autoloader with `--no-dev` flag before packaging
+  - Package script now runs `composer install --no-dev` before creating zip
+  - Dev dependencies automatically restored after packaging
+
+### Changed
+- **Package Script** - Completely rewrote vendor handling
+  - Now regenerates composer autoloader without dev dependencies
+  - Removes need for explicit vendor package exclusions
+  - Simpler, more maintainable packaging process
+  - Package size: 111KB (reduced from 168KB)
+
+### Technical Details
+- Composer autoloader now contains ONLY production dependencies
+- No autoload_files.php in package (no files need autoloading)
+- Only autoload_classmap.php and autoload_psr4.php for plugin classes
+- Dev dependencies removed before zip creation
+- Dev dependencies restored after packaging for continued development
+
+### Migration
+- **Critical**: v2.0.2 is broken, upgrade to v2.0.3 immediately
+- Simply replace plugin files - no configuration changes needed
+
 ## [2.0.2] - 2025-10-27
 
 ### Fixed
