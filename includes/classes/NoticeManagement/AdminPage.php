@@ -582,6 +582,9 @@ class AdminPage implements WithHooksInterface {
 	 * - User capability
 	 * - Pattern input
 	 *
+	 * Note: We use wp_kses_post instead of sanitize_text_field to preserve
+	 * special characters in regex patterns like <, >, (, ), etc.
+	 *
 	 * @return void
 	 */
 	public function handle_remove_pattern_ajax(): void {
@@ -598,7 +601,8 @@ class AdminPage implements WithHooksInterface {
 		}
 
 		// Get and sanitize input
-		$pattern = isset( $_POST['pattern'] ) ? sanitize_text_field( wp_unslash( $_POST['pattern'] ) ) : '';
+		// Use stripslashes_deep + trim instead of sanitize_text_field to preserve special chars
+		$pattern = isset( $_POST['pattern'] ) ? trim( stripslashes_deep( $_POST['pattern'] ) ) : '';
 
 		// Validate pattern
 		if ( empty( $pattern ) ) {

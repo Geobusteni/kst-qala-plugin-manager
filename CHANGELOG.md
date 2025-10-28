@@ -5,6 +5,20 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.10] - 2025-10-28
+
+### Fixed
+- **Clear All Patterns Button Not Working**
+  - Added missing `handleClearAllPatterns` function to combined JavaScript file
+  - Added missing event binding for clear all patterns button
+  - JavaScript was not rebuilt properly in v2.0.9, now correctly includes all functionality
+
+- **Pattern Deletion Fails for Patterns with Special Characters**
+  - Changed sanitization in `handle_remove_pattern_ajax()` from `sanitize_text_field()` to `stripslashes_deep()`
+  - `sanitize_text_field()` was stripping special characters like `<`, `>`, `(`, `)` from regex patterns
+  - Patterns containing HTML-like syntax can now be deleted correctly
+  - Example: Pattern `(?i)<p[^>]*>[^<]*(updated|created|deleted)[^<]*<\/p>` can now be removed
+
 ## [2.0.9] - 2025-10-28
 
 ### Fixed
