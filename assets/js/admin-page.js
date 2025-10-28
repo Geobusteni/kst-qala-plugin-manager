@@ -47,6 +47,9 @@
 
 			// Remove from allowlist
 			$(document).on('click', '.qala-remove-from-allowlist', this.handleRemovePattern.bind(this));
+
+			// Clear all patterns
+			$('#qala-clear-all-patterns-btn').on('click', this.handleClearAllPatterns.bind(this));
 		},
 
 		/**
@@ -205,6 +208,50 @@
 				error: function (xhr, status, error) {
 					console.error('AJAX error:', error);
 					alert(qalaAdminPage.strings.removeError);
+					$button.prop('disabled', false).removeClass('qala-loading');
+				}
+			});
+		},
+
+		/**
+		 * Handle clear all patterns from allowlist
+		 */
+		handleClearAllPatterns: function (e) {
+			e.preventDefault();
+
+			const $button = $(e.currentTarget);
+
+			// Confirm removal
+			if (!confirm(qalaAdminPage.strings.confirmClearAll)) {
+				return;
+			}
+
+			// Disable button and show loading state
+			$button.prop('disabled', true).addClass('qala-loading');
+
+			// Send AJAX request
+			$.ajax({
+				url: qalaAdminPage.ajaxUrl,
+				type: 'POST',
+				data: {
+					action: 'qala_clear_all_patterns',
+					nonce: qalaAdminPage.nonces.clearAllPatterns
+				},
+				success: function (response) {
+					if (response.success) {
+						// Reload page to show empty state
+						location.reload();
+					} else {
+						const errorMessage = response.data && response.data.message
+							? response.data.message
+							: qalaAdminPage.strings.clearAllError;
+						alert(errorMessage);
+						$button.prop('disabled', false).removeClass('qala-loading');
+					}
+				},
+				error: function (xhr, status, error) {
+					console.error('AJAX error:', error);
+					alert(qalaAdminPage.strings.clearAllError);
 					$button.prop('disabled', false).removeClass('qala-loading');
 				}
 			});

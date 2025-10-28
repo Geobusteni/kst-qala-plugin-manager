@@ -5,6 +5,26 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.9] - 2025-10-28
+
+### Fixed
+- **Regex Pattern Cannot Be Added** (Issue #13)
+  - Regex patterns without delimiters now automatically have `/` delimiters added
+  - Pattern `(?i)<p[^>]*>[^<]*(updated|created|deleted)[^<]*<\/p>` now works correctly
+  - Added `normalize_regex()` method to add delimiters if missing
+  - Patterns like `(?i)pattern` are converted to `/(?i)pattern/`
+  - Patterns already having delimiters (/, #, ~, @, !, %, `, |) are left unchanged
+  - Improved regex validation to work with normalized patterns
+
+### Added
+- **Clear All Patterns Button** (Issue #13)
+  - New "Clear All Patterns" button in Allowlist Patterns section
+  - Only visible when patterns exist
+  - Requires confirmation before clearing
+  - Clears all allowlist patterns with single click
+  - New AJAX handler: `qala_clear_all_patterns`
+  - New AllowlistManager method: `remove_all_patterns()`
+
 ## [2.0.8] - 2025-10-28
 
 ### Added

@@ -84,6 +84,8 @@ class AllowlistManager {
 	 * Adds a new pattern to the database that will be used to determine
 	 * which notices should be shown despite global hiding.
 	 *
+	 * For regex patterns: automatically adds delimiters (/) if missing.
+	 *
 	 * @param string $pattern The pattern value (function name, wildcard, or regex).
 	 * @param string $type Pattern type: 'exact', 'wildcard', or 'regex'. Defaults to 'exact'.
 	 *
@@ -92,8 +94,12 @@ class AllowlistManager {
 	public function add_pattern( string $pattern, string $type = 'exact' ): bool {
 		global $wpdb;
 
-		// Validate regex patterns before adding
+		// Process regex patterns before adding
 		if ( $type === 'regex' ) {
+			// Add delimiters if missing
+			$pattern = $this->normalize_regex( $pattern );
+
+			// Validate regex pattern
 			if ( ! $this->is_valid_regex( $pattern ) ) {
 				return false;
 			}
@@ -162,6 +168,31 @@ class AllowlistManager {
 
 		// Returns number of rows affected, convert to boolean
 		return $result > 0;
+	}
+
+	/**
+	 * Remove all patterns from the allowlist
+	 *
+	 * Deletes all patterns regardless of active status.
+	 * Use with caution - this action cannot be undone.
+	 *
+	 * @return bool True on success, false on failure.
+	 */
+	public function remove_all_patterns(): bool {
+		global $wpdb;
+
+		$result = $wpdb->query(
+			$wpdb->prepare(
+				"DELETE FROM {$this->get_table_name()} WHERE 1 = %d",
+				1
+			)
+		);
+
+		// Clear cache after modification
+		$this->clear_cache();
+
+		// Returns number of rows affected, convert to boolean
+		return $result !== false;
 	}
 
 	/**
@@ -286,6 +317,38 @@ class AllowlistManager {
 	private function matches_regex( string $callback_name, string $regex_pattern ): bool {
 		// Suppress warnings for invalid regex
 		return (bool) @preg_match( $regex_pattern, $callback_name );
+	}
+
+	/**
+	 * Normalize regex pattern by adding delimiters if missing
+	 *
+	 * PHP regex requires delimiters. This method adds / delimiters if they're missing.
+	 * Handles common patterns like:
+	 * - (?i)pattern -> /(?i)pattern/
+	 * - ^pattern$ -> /^pattern$/
+	 * - /pattern/ -> /pattern/ (already has delimiters)
+	 *
+	 * @param string $pattern The regex pattern to normalize.
+	 *
+	 * @return string Normalized regex with delimiters.
+	 */
+	private function normalize_regex( string $pattern ): string {
+		$pattern = trim( $pattern );
+
+		// Check if pattern already has delimiters
+		// Common delimiters: / # ~ @ ! % ` |
+		$first_char = substr( $pattern, 0, 1 );
+		$common_delimiters = [ '/', '#', '~', '@', '!', '%', '`', '|' ];
+
+		if ( in_array( $first_char, $common_delimiters, true ) ) {
+			// Pattern already has delimiters
+			return $pattern;
+		}
+
+		// Add / delimiters
+		// Escape any / characters in the pattern
+		$escaped_pattern = str_replace( '/', '\/', $pattern );
+		return '/' . $escaped_pattern . '/';
 	}
 
 	/**

@@ -88,6 +88,7 @@ class AdminPage implements WithHooksInterface {
 		// AJAX handlers
 		add_action( 'wp_ajax_qala_add_allowlist_pattern', [ $this, 'handle_add_pattern_ajax' ] );
 		add_action( 'wp_ajax_qala_remove_allowlist_pattern', [ $this, 'handle_remove_pattern_ajax' ] );
+		add_action( 'wp_ajax_qala_clear_all_patterns', [ $this, 'handle_clear_all_patterns_ajax' ] );
 		add_action( 'wp_ajax_qala_toggle_notices', [ $this, 'handle_toggle_ajax' ] );
 	}
 
@@ -385,7 +386,14 @@ class AdminPage implements WithHooksInterface {
 
 				<!-- Allowlist Management -->
 				<div class="qala-section qala-allowlist">
-					<h2><?php esc_html_e( 'Allowlist Patterns', 'qala-plugin-manager' ); ?></h2>
+					<div class="qala-section-header">
+						<h2><?php esc_html_e( 'Allowlist Patterns', 'qala-plugin-manager' ); ?></h2>
+						<?php if ( ! empty( $allowlist_patterns ) ) : ?>
+							<button type="button" id="qala-clear-all-patterns-btn" class="button button-secondary">
+								<?php esc_html_e( 'Clear All Patterns', 'qala-plugin-manager' ); ?>
+							</button>
+						<?php endif; ?>
+					</div>
 					<p class="description">
 						<?php esc_html_e( 'Patterns in this list will NOT be hidden.', 'qala-plugin-manager' ); ?>
 					</p>
@@ -494,6 +502,7 @@ class AdminPage implements WithHooksInterface {
 				'nonces' => [
 					'addPattern' => wp_create_nonce( 'qala_add_pattern' ),
 					'removePattern' => wp_create_nonce( 'qala_remove_pattern' ),
+					'clearAllPatterns' => wp_create_nonce( 'qala_clear_all_patterns' ),
 					'toggle' => wp_create_nonce( 'qala_toggle_notices' ),
 				],
 				'strings' => [
@@ -501,7 +510,10 @@ class AdminPage implements WithHooksInterface {
 					'addError' => __( 'Failed to add pattern to allowlist', 'qala-plugin-manager' ),
 					'removeSuccess' => __( 'Pattern removed from allowlist successfully', 'qala-plugin-manager' ),
 					'removeError' => __( 'Failed to remove pattern from allowlist', 'qala-plugin-manager' ),
+					'clearAllSuccess' => __( 'All patterns cleared successfully', 'qala-plugin-manager' ),
+					'clearAllError' => __( 'Failed to clear patterns', 'qala-plugin-manager' ),
 					'confirmRemove' => __( 'Are you sure you want to remove this pattern?', 'qala-plugin-manager' ),
+					'confirmClearAll' => __( 'Are you sure you want to clear ALL patterns? This action cannot be undone.', 'qala-plugin-manager' ),
 					'emptyPattern' => __( 'Please enter a pattern', 'qala-plugin-manager' ),
 				],
 			]
@@ -605,6 +617,42 @@ class AdminPage implements WithHooksInterface {
 		} else {
 			wp_send_json_error( [
 				'message' => __( 'Failed to remove pattern from allowlist', 'qala-plugin-manager' ),
+			] );
+		}
+	}
+
+	/**
+	 * Handle AJAX request to clear all patterns from allowlist
+	 *
+	 * Validates:
+	 * - Nonce
+	 * - User capability
+	 *
+	 * @return void
+	 */
+	public function handle_clear_all_patterns_ajax(): void {
+		// Verify nonce
+		if ( ! check_ajax_referer( 'qala_clear_all_patterns', 'nonce', false ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid nonce', 'qala-plugin-manager' ) ] );
+			return;
+		}
+
+		// Check capability
+		if ( ! $this->user_has_capability( 'qala_full_access' ) ) {
+			wp_send_json_error( [ 'message' => __( 'Permission denied', 'qala-plugin-manager' ) ] );
+			return;
+		}
+
+		// Remove all patterns from allowlist
+		$result = $this->allowlist->remove_all_patterns();
+
+		if ( $result ) {
+			wp_send_json_success( [
+				'message' => __( 'All patterns cleared successfully', 'qala-plugin-manager' ),
+			] );
+		} else {
+			wp_send_json_error( [
+				'message' => __( 'Failed to clear patterns', 'qala-plugin-manager' ),
 			] );
 		}
 	}
