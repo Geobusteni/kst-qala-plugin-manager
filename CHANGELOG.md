@@ -5,6 +5,34 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.11] - 2025-10-28
+
+### Added
+- **Enhanced Regex Pattern Documentation**
+  - Comprehensive pattern type documentation in admin page
+  - Clear explanation of how regex patterns work
+  - Working examples for regex patterns: `(added|updated|created)`, `\b(success|error|warning)\b`, etc.
+  - Common mistakes section showing what NOT to do (HTML tags, escaped slashes, manual delimiters)
+  - Visual distinction between Wildcard, Exact, and Regex pattern types
+  - Highlighted examples with color-coded good/bad practices
+  - Important notes about matching text content (not HTML markup)
+  - Tip suggesting Wildcard for users unfamiliar with regex
+
+### Improved
+- **Pattern Help Section Styling**
+  - Professional bordered sections for each pattern type
+  - Color-coded examples (green for good, red for bad)
+  - Special yellow background for regex section to draw attention
+  - Responsive design for mobile devices
+  - Better typography and spacing for readability
+  - WordPress-native styling that fits admin interface
+
+### Documentation
+- Explains that delimiters are optional (added automatically)
+- Clarifies that patterns match against text content, not HTML
+- Warns about common errors: HTML tags, escaped slashes, manual delimiters
+- Provides copy-paste ready examples
+
 ## [2.0.10] - 2025-10-28
 
 ### Fixed

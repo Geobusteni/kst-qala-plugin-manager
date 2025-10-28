@@ -419,20 +419,62 @@ class AdminPage implements WithHooksInterface {
 							</button>
 						</div>
 						<div id="qala-add-pattern-message" class="qala-message" style="display: none;"></div>
-						<p class="description">
-							<?php
-							esc_html_e( 'Pattern types:', 'qala-plugin-manager' );
-							?>
-							<br>
-							<strong><?php esc_html_e( 'Wildcard:', 'qala-plugin-manager' ); ?></strong>
-							<?php esc_html_e( 'Use * to match any characters. Example: *Category added* matches any notice containing "Category added"', 'qala-plugin-manager' ); ?>
-							<br>
-							<strong><?php esc_html_e( 'Exact:', 'qala-plugin-manager' ); ?></strong>
-							<?php esc_html_e( 'Matches the exact callback name. Example: MyClass::my_notice_function', 'qala-plugin-manager' ); ?>
-							<br>
-							<strong><?php esc_html_e( 'Regex:', 'qala-plugin-manager' ); ?></strong>
-							<?php esc_html_e( 'Advanced pattern matching using regular expressions', 'qala-plugin-manager' ); ?>
-						</p>
+
+						<div class="qala-pattern-help">
+							<h4><?php esc_html_e( 'Pattern Types', 'qala-plugin-manager' ); ?></h4>
+
+							<div class="qala-pattern-type-help">
+								<strong><?php esc_html_e( '1. Wildcard (*)', 'qala-plugin-manager' ); ?></strong>
+								<p><?php esc_html_e( 'Use * to match any characters. Simple and recommended for most cases.', 'qala-plugin-manager' ); ?></p>
+								<p class="qala-example">
+									<?php esc_html_e( 'Examples:', 'qala-plugin-manager' ); ?>
+									<code>*Category added*</code> - <?php esc_html_e( 'matches any notice containing "Category added"', 'qala-plugin-manager' ); ?><br>
+									<code>*saved successfully*</code> - <?php esc_html_e( 'matches notices with "saved successfully"', 'qala-plugin-manager' ); ?>
+								</p>
+							</div>
+
+							<div class="qala-pattern-type-help">
+								<strong><?php esc_html_e( '2. Exact Match', 'qala-plugin-manager' ); ?></strong>
+								<p><?php esc_html_e( 'Matches the exact callback function name (for developers).', 'qala-plugin-manager' ); ?></p>
+								<p class="qala-example">
+									<?php esc_html_e( 'Example:', 'qala-plugin-manager' ); ?>
+									<code>MyClass::my_notice_function</code>
+								</p>
+							</div>
+
+							<div class="qala-pattern-type-help qala-regex-help">
+								<strong><?php esc_html_e( '3. Regex (Advanced)', 'qala-plugin-manager' ); ?></strong>
+								<p><?php esc_html_e( 'Advanced pattern matching using regular expressions. Matches against notice TEXT CONTENT only (not HTML).', 'qala-plugin-manager' ); ?></p>
+
+								<div class="qala-regex-details">
+									<p><strong><?php esc_html_e( 'How it works:', 'qala-plugin-manager' ); ?></strong></p>
+									<ul>
+										<li><?php esc_html_e( 'Delimiters (/) are optional - automatically added if missing', 'qala-plugin-manager' ); ?></li>
+										<li><?php esc_html_e( 'Case-insensitive by default', 'qala-plugin-manager' ); ?></li>
+										<li><?php esc_html_e( 'Matches against TEXT CONTENT (HTML tags are already removed)', 'qala-plugin-manager' ); ?></li>
+									</ul>
+
+									<p><strong><?php esc_html_e( 'Working Examples:', 'qala-plugin-manager' ); ?></strong></p>
+									<p class="qala-example qala-example-good">
+										<code>(added|updated|created)</code> - <?php esc_html_e( 'Match notices with these words', 'qala-plugin-manager' ); ?><br>
+										<code>\b(success|error|warning)\b</code> - <?php esc_html_e( 'Match complete words only', 'qala-plugin-manager' ); ?><br>
+										<code>post.*published</code> - <?php esc_html_e( 'Match "post" followed by "published"', 'qala-plugin-manager' ); ?><br>
+										<code>^Settings saved</code> - <?php esc_html_e( 'Match notices starting with "Settings saved"', 'qala-plugin-manager' ); ?>
+									</p>
+
+									<p><strong><?php esc_html_e( 'Common Mistakes (Don\'t do this):', 'qala-plugin-manager' ); ?></strong></p>
+									<p class="qala-example qala-example-bad">
+										<code>&lt;p&gt;text&lt;/p&gt;</code> - <?php esc_html_e( 'Don\'t use HTML tags (matcher works on text only)', 'qala-plugin-manager' ); ?><br>
+										<code>&lt;\/p&gt;</code> - <?php esc_html_e( 'Don\'t escape forward slashes (causes JavaScript errors)', 'qala-plugin-manager' ); ?><br>
+										<code>/pattern/i</code> - <?php esc_html_e( 'Don\'t add delimiters manually (added automatically)', 'qala-plugin-manager' ); ?>
+									</p>
+
+									<p><strong><?php esc_html_e( 'Tip:', 'qala-plugin-manager' ); ?></strong>
+										<?php esc_html_e( 'If you\'re not familiar with regex, use Wildcard (*) instead - it\'s simpler and works for most cases!', 'qala-plugin-manager' ); ?>
+									</p>
+								</div>
+							</div>
+						</div>
 					</div>
 
 					<!-- Existing Patterns List -->
