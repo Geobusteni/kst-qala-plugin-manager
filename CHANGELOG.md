@@ -5,6 +5,23 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.8] - 2025-10-28
+
+### Added
+- **Site Health Visibility Settings** (Issue #12)
+  - New setting: "Hide Site Health for Everyone" (checked by default)
+  - New setting: "Show Site Health for Non-Qala Users" (unchecked by default)
+  - Both settings added to Settings > Hide Notices page under new "Site Health Settings" section
+  - Default behavior: Site Health hidden for all users (including qala_full_access users)
+
+### Changed
+- **Site Health visibility logic** now controlled by two settings:
+  1. If "Hide for Everyone" is enabled (default), Site Health is hidden for all users
+  2. If "Hide for Everyone" is disabled:
+     - If "Show for Non-Qala Users" is enabled, Site Health visible for all users
+     - If "Show for Non-Qala Users" is disabled (default), Site Health visible only for qala_full_access users
+- Updated SiteHealthHider class to use new settings instead of only checking capability
+
 ## [2.0.7] - 2025-10-28
 
 ### Fixed

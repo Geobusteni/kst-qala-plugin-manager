@@ -47,10 +47,12 @@ class SiteHealthHider implements WithHooksInterface {
 	}
 
 	/**
-	 * Remove Site Health menu page for users without qala_full_access
+	 * Remove Site Health menu page based on settings
 	 *
 	 * Removes the "Site Health" submenu item from Tools menu.
-	 * Only affects users WITHOUT qala_full_access capability.
+	 * Visibility controlled by two settings:
+	 * 1. qala_hide_site_health_for_all (default: yes) - Hide for everyone
+	 * 2. qala_show_site_health_for_non_qala_users (default: no) - Show for non-qala users
 	 *
 	 * Hook: admin_menu (priority 999)
 	 *
@@ -62,8 +64,8 @@ class SiteHealthHider implements WithHooksInterface {
 			return;
 		}
 
-		// Skip if user has qala_full_access capability
-		if ( $this->user_has_capability( 'qala_full_access' ) ) {
+		// Check if we should hide Site Health
+		if ( ! $this->should_hide_site_health() ) {
 			return;
 		}
 
@@ -73,10 +75,12 @@ class SiteHealthHider implements WithHooksInterface {
 	}
 
 	/**
-	 * Remove Site Health dashboard widget for users without qala_full_access
+	 * Remove Site Health dashboard widget based on settings
 	 *
 	 * Removes the "Site Health Status" meta box from the dashboard.
-	 * Only affects users WITHOUT qala_full_access capability.
+	 * Visibility controlled by two settings:
+	 * 1. qala_hide_site_health_for_all (default: yes) - Hide for everyone
+	 * 2. qala_show_site_health_for_non_qala_users (default: no) - Show for non-qala users
 	 *
 	 * Hook: wp_dashboard_setup
 	 *
@@ -88,8 +92,8 @@ class SiteHealthHider implements WithHooksInterface {
 			return;
 		}
 
-		// Skip if user has qala_full_access capability
-		if ( $this->user_has_capability( 'qala_full_access' ) ) {
+		// Check if we should hide Site Health
+		if ( ! $this->should_hide_site_health() ) {
 			return;
 		}
 
@@ -101,10 +105,12 @@ class SiteHealthHider implements WithHooksInterface {
 	}
 
 	/**
-	 * Redirect unauthorized users trying to access Site Health
+	 * Redirect users trying to access Site Health based on settings
 	 *
-	 * If a user without qala_full_access tries to access Site Health directly
-	 * via URL, redirect them to the dashboard.
+	 * If Site Health should be hidden based on settings, redirect to dashboard.
+	 * Visibility controlled by two settings:
+	 * 1. qala_hide_site_health_for_all (default: yes) - Hide for everyone
+	 * 2. qala_show_site_health_for_non_qala_users (default: no) - Show for non-qala users
 	 *
 	 * Handles both site-health.php (WP 5.2+) and health-check.php (older versions).
 	 * Skips AJAX requests to avoid breaking Site Health API calls.
@@ -119,11 +125,6 @@ class SiteHealthHider implements WithHooksInterface {
 			return;
 		}
 
-		// Skip if user has qala_full_access capability
-		if ( $this->user_has_capability( 'qala_full_access' ) ) {
-			return;
-		}
-
 		// Skip AJAX requests (Site Health API endpoints)
 		if ( function_exists( 'wp_doing_ajax' ) && wp_doing_ajax() ) {
 			return;
@@ -131,6 +132,11 @@ class SiteHealthHider implements WithHooksInterface {
 
 		// Check if we're on a Site Health page
 		if ( ! $this->is_site_health_page() ) {
+			return;
+		}
+
+		// Check if we should hide Site Health
+		if ( ! $this->should_hide_site_health() ) {
 			return;
 		}
 
@@ -163,5 +169,37 @@ class SiteHealthHider implements WithHooksInterface {
 		];
 
 		return in_array( $pagenow, $site_health_pages, true );
+	}
+
+	/**
+	 * Determine if Site Health should be hidden for current user
+	 *
+	 * Logic:
+	 * 1. If qala_hide_site_health_for_all is 'yes' (default), hide for everyone
+	 * 2. If qala_hide_site_health_for_all is 'no':
+	 *    a. If qala_show_site_health_for_non_qala_users is 'yes', show for everyone
+	 *    b. If qala_show_site_health_for_non_qala_users is 'no' (default), show only for qala_full_access users
+	 *
+	 * @return bool True if Site Health should be hidden, false if it should be visible
+	 */
+	public function should_hide_site_health(): bool {
+		// Get settings with defaults
+		$hide_for_all = get_option( 'qala_hide_site_health_for_all', 'yes' );
+		$show_for_non_qala = get_option( 'qala_show_site_health_for_non_qala_users', 'no' );
+
+		// If hide for all is enabled, hide Site Health for everyone
+		if ( $hide_for_all === 'yes' ) {
+			return true;
+		}
+
+		// If hide for all is disabled, check the second setting
+		// If show for non-qala users is enabled, show for everyone (don't hide)
+		if ( $show_for_non_qala === 'yes' ) {
+			return false;
+		}
+
+		// If show for non-qala users is disabled, show only for qala_full_access users
+		// Hide for users WITHOUT qala_full_access
+		return ! $this->user_has_capability( 'qala_full_access' );
 	}
 }

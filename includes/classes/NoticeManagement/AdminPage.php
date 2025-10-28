@@ -133,6 +133,27 @@ class AdminPage implements WithHooksInterface {
 			]
 		);
 
+		// Register Site Health hiding settings
+		register_setting(
+			'qala_notices',
+			'qala_hide_site_health_for_all',
+			[
+				'type' => 'string',
+				'default' => 'yes',
+				'sanitize_callback' => [ $this, 'sanitize_yes_no' ],
+			]
+		);
+
+		register_setting(
+			'qala_notices',
+			'qala_show_site_health_for_non_qala_users',
+			[
+				'type' => 'string',
+				'default' => 'no',
+				'sanitize_callback' => [ $this, 'sanitize_yes_no' ],
+			]
+		);
+
 		// Add settings section
 		add_settings_section(
 			'qala_notices_main',
@@ -148,6 +169,32 @@ class AdminPage implements WithHooksInterface {
 			[ $this, 'render_enabled_field' ],
 			'qala-hide-notices',
 			'qala_notices_main'
+		);
+
+		// Add Site Health settings section
+		add_settings_section(
+			'qala_site_health',
+			__( 'Site Health Settings', 'qala-plugin-manager' ),
+			[ $this, 'render_site_health_section_description' ],
+			'qala-hide-notices'
+		);
+
+		// Add Site Health hide for all field
+		add_settings_field(
+			'qala_hide_site_health_for_all',
+			__( 'Hide Site Health for Everyone', 'qala-plugin-manager' ),
+			[ $this, 'render_hide_site_health_for_all_field' ],
+			'qala-hide-notices',
+			'qala_site_health'
+		);
+
+		// Add Site Health show for non-qala users field
+		add_settings_field(
+			'qala_show_site_health_for_non_qala_users',
+			__( 'Show Site Health for Non-Qala Users', 'qala-plugin-manager' ),
+			[ $this, 'render_show_site_health_for_non_qala_users_field' ],
+			'qala-hide-notices',
+			'qala_site_health'
 		);
 	}
 
@@ -184,6 +231,66 @@ class AdminPage implements WithHooksInterface {
 		</label>
 		<p class="description">
 			<?php esc_html_e( 'When enabled, notices will be hidden for users without qala_full_access capability.', 'qala-plugin-manager' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render Site Health section description
+	 *
+	 * @return void
+	 */
+	public function render_site_health_section_description(): void {
+		echo '<p>';
+		esc_html_e(
+			'Control Site Health page and dashboard widget visibility.',
+			'qala-plugin-manager'
+		);
+		echo '</p>';
+	}
+
+	/**
+	 * Render hide site health for all field
+	 *
+	 * @return void
+	 */
+	public function render_hide_site_health_for_all_field(): void {
+		$hide_for_all = get_option( 'qala_hide_site_health_for_all', 'yes' );
+		?>
+		<label>
+			<input
+				type="checkbox"
+				name="qala_hide_site_health_for_all"
+				value="yes"
+				<?php checked( $hide_for_all, 'yes' ); ?>
+			/>
+			<?php esc_html_e( 'Hide Site Health link and dashboard widget for everyone', 'qala-plugin-manager' ); ?>
+		</label>
+		<p class="description">
+			<?php esc_html_e( 'When enabled, Site Health will be hidden for all users, including those with qala_full_access capability.', 'qala-plugin-manager' ); ?>
+		</p>
+		<?php
+	}
+
+	/**
+	 * Render show site health for non-qala users field
+	 *
+	 * @return void
+	 */
+	public function render_show_site_health_for_non_qala_users_field(): void {
+		$show_for_non_qala = get_option( 'qala_show_site_health_for_non_qala_users', 'no' );
+		?>
+		<label>
+			<input
+				type="checkbox"
+				name="qala_show_site_health_for_non_qala_users"
+				value="yes"
+				<?php checked( $show_for_non_qala, 'yes' ); ?>
+			/>
+			<?php esc_html_e( 'Show Site Health for non-qala users', 'qala-plugin-manager' ); ?>
+		</label>
+		<p class="description">
+			<?php esc_html_e( 'When enabled, Site Health will be visible for all users, not just those with qala_full_access capability.', 'qala-plugin-manager' ); ?>
 		</p>
 		<?php
 	}
