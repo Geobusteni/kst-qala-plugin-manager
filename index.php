@@ -3,7 +3,7 @@
  * Plugin Name: Qala Plugin Manager
  * Plugin URI: https://angrycreative.se
  * Description: Plugin management and comprehensive admin notice control with nuclear hide-all approach
- * Version: 2.0.6
+ * Version: 2.0.7
  * Author: Angry Creative
  * Author URI: https://angrycreative.com
  * License: GPL2

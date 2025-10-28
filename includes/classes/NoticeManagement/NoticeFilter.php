@@ -328,13 +328,23 @@ class NoticeFilter implements WithHooksInterface {
 	 * - Admin bar toggle styles
 	 * - Admin page styles
 	 *
-	 * This CSS is loaded on ALL admin pages at priority 1 for optimal performance
-	 * and simpler asset management. The notice-hiding CSS rules will automatically
-	 * apply when conditions are met (handled by filter_notices).
+	 * IMPORTANT: CSS is only loaded when user preference is to HIDE notices.
+	 * If user wants to show all notices (qala_show_notices = 'yes'), CSS is not loaded.
+	 * This prevents the notice-hiding CSS from interfering with notice visibility.
 	 *
 	 * @return void
 	 */
 	public function enqueue_assets(): void {
+		// Check user preference - 'yes' means show notices, 'no' means hide them
+		$user_id = get_current_user_id();
+		$user_preference = get_user_meta( $user_id, 'qala_show_notices', true );
+
+		// Only load CSS if user wants to HIDE notices (preference is not 'yes')
+		// Default to hiding if no preference set
+		if ( $user_preference === 'yes' ) {
+			return; // User wants to see notices, don't load hiding CSS
+		}
+
 		$css_path = \QalaPluginManager\Plugin::get_path() . '/assets/dist/qala-plugin-manager.css';
 		$css_url = \QalaPluginManager\Plugin::get_url() . '/assets/dist/qala-plugin-manager.css';
 

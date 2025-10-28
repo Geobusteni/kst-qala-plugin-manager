@@ -5,6 +5,15 @@ All notable changes to Qala Plugin Manager will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.7] - 2025-10-28
+
+### Fixed
+- **Notices Still Hidden When User Wants to Show Them** (Issue #11)
+  - CSS was being loaded regardless of user preference
+  - Notice-hiding CSS now only loads when user preference is to HIDE notices
+  - When user clicks "Show Notices", CSS is not loaded and all notices display normally
+  - Fixed by checking `qala_show_notices` user meta before enqueuing CSS
+
 ## [2.0.6] - 2025-10-27
 
 ### Fixed
