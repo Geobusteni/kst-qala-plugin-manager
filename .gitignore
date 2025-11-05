@@ -43,4 +43,4 @@ yarn-error.log*
 webpack.config.js
 package.json
 package-lock.json
-composer.lock
+# Note: composer.lock is tracked to ensure PHP 7.4 compatibility
